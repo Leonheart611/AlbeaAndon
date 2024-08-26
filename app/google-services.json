@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "678228336958",
+    "project_id": "albeaandon",
+    "storage_bucket": "albeaandon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:678228336958:android:fa29ea9a14d723b5334c6f",
+        "android_client_info": {
+          "package_name": "com.mika.enterprise.albeaandon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg8slr6ejN5Ns1RlTwTsZZdbu182u-zic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
