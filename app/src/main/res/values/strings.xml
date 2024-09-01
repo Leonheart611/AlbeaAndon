@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">AlbeaRMS</string>
+    <string name="app_name">Albea ANDON</string>
+    <string name="login_title">LOGIN ANDON</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_button_label">LOGIN</string>
 </resources>
