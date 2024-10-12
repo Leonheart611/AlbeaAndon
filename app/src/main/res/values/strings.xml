@@ -4,4 +4,32 @@
     <string name="login_username_label">Username</string>
     <string name="login_password_label">Password</string>
     <string name="login_button_label">LOGIN</string>
+    <string name="logout_title_label">Logout</string>
+    <string name="login_username_error_label">Username is required</string>
+    <string name="login_password_error_label">Password is required</string>
+
+    <string name="ticket_id_label">Ticket No: %1$s</string>
+    <string name="ticket_status_label">%1$s</string>
+    <string name="ticket_machine_label">Machine No: %1$s</string>
+    <string name="ticket_assign_label">Assign To: %1$s</string>
+    <string name="ticket_problem_label">Problem: %1$s</string>
+    <string name="ticket_date_label">Create Date: %1$s</string>"
+    <string name="ticket_machine_loc_label">Machine Loc: %1$s</string>"
+    <string name="home_title_label">Hi, %1$s</string>
+    <string name="assign_title_label">Assign Ticket</string>
+    <string name="assign_button_label">Assign Personnel</string>
+    <string name="assign_personnel_name_label">Name: %1$s</string>
+    <string name="assign_personnel_dept_label">Department: %1$s</string>
+    <string name="assign_personnel_ticket_label">Total Ticket: %1$s</string>
+    <string name="assign_personnel_available_label">Available Personnel List</string>
+    <string name="assign_personnel_not_selected_label">No Personnel Selected</string>
+    <string name="assign_personnel_not_selected_desc">Please select personnel to continue</string>
+    <string name="assign_personnel_not_selected_button_label">OK</string>
+    <string name="nfc_verify_title">NFC Verification</string>
+    <string name="nfc_verify_desc">Please tap your phone into NFC Card at Machine location for verify your location and position</string>
+    <string name="nfc_verify_button_label">Close</string>
+    <string name="nfc_verify_enable_nfc_message">NFC is not enabled on this device. Please enable NFC to continue.</string>"
+    <string name="nfc_verify_fail_title">Failed to Verify</string>
+    <string name="nfc_verify_fail_desc">Failed to verify your location and position nfc value is %1$s</string>
+    <string name="nfc_verify_fail_button_label">Close</string>
 </resources>

@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.mika.enterprise.albeaandon.core.util.ErrorResponse
+import com.mika.enterprise.albeaandon.ui.util.LoadingDialog
+import com.mika.enterprise.albeaandon.ui.util.MessageDialog
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     private var _binding: VB? = null
@@ -26,5 +29,38 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun showLoadingDialog() {
+        val loadingDialog = LoadingDialog()
+        loadingDialog.show(this.parentFragmentManager, "loading_dialog")
+    }
+
+    fun hideLoadingDialog() {
+        val loadingDialog =
+            this.parentFragmentManager.findFragmentByTag("loading_dialog") as? LoadingDialog
+        loadingDialog?.dismiss()
+    }
+
+    fun showErrorMessage(errorResponse: ErrorResponse, onRetry: () -> Unit) {
+        val dialog = MessageDialog(requireContext())
+        dialog.setTitle("Failed Retrieve Connection Error ${errorResponse.code}")
+        dialog.setMessage("${errorResponse.message}")
+        dialog.setActionButton("Retry") {
+            onRetry()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    fun showErrorMessage(title: String, message: String, buttonText: String, onRetry: () -> Unit) {
+        val dialog = MessageDialog(requireContext())
+        dialog.setTitle(title)
+        dialog.setMessage(message)
+        dialog.setActionButton(buttonText) {
+            onRetry()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }
