@@ -20,6 +20,8 @@ class AssignViewModel @Inject constructor(
     val isNotAuthorized = MutableLiveData<Boolean>()
     private val _personnelList = MutableLiveData<List<PersonnelData>>()
     val personnelList: LiveData<List<PersonnelData>> = _personnelList
+    private val _assignResult = MutableLiveData<Boolean>()
+    val assignResult: LiveData<Boolean> = _assignResult
 
     var selectedPersonnel: PersonnelData? = null
     var isNotSameUserGroup = false
@@ -48,6 +50,33 @@ class AssignViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun postAssignTicket(username: String, ticketId: Int) {
+        viewModelScope.launch {
+            showLoading.postValue(true)
+            networkRepository.postAssignTicket(username, ticketId).collect {
+                showLoading.postValue(false)
+                when (it) {
+                    is ResultResponse.Error -> {
+
+                    }
+
+                    is ResultResponse.Success -> {
+                        _assignResult.postValue(it.data.success)
+                    }
+
+                    is ResultResponse.UnAuthorized -> {
+                        isNotAuthorized.postValue(true)
+                    }
+                }
+            }
+
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch { networkRepository.logout() }
     }
 
 }

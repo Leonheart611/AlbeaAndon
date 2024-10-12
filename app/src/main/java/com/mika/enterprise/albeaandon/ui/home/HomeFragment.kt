@@ -40,7 +40,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
         viewModel.username.observe(viewLifecycleOwner) {
             binding.tbHome.title = getString(R.string.home_title_label, it)
         }
-        viewModel.isNotAuthorized.observe(viewLifecycleOwner) { if (it) logOut() }
+        viewModel.isNotAuthorized.observe(viewLifecycleOwner) {
+            if (it)
+                showMessageDialog(
+                    title = getString(R.string.unauthorized_title),
+                    message = getString(R.string.unauthorized_desc),
+                    buttonText = getString(R.string.unauthorized_button_label)
+                ) { logOut() }
+        }
         binding.tbHome.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.menu_logout -> {
@@ -55,7 +62,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
 
     private fun logOut() {
         viewModel.logout()
-        findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+        findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToLoginFragment())
     }
 
     private fun setupAdapter() {

@@ -2,7 +2,9 @@ package com.mika.enterprise.albeaandon.core.repository
 
 import android.content.SharedPreferences
 import com.mika.enterprise.albeaandon.core.domain.API
+import com.mika.enterprise.albeaandon.core.model.request.AssignTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
+import com.mika.enterprise.albeaandon.core.model.response.AssignTicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelAvailabilityResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
@@ -19,6 +21,10 @@ interface NetworkRepository {
     suspend fun login(username: String, password: String): Flow<ResultResponse<LoginResponse>>
     suspend fun getTickets(status: String, page: Int): Flow<ResultResponse<TicketResponse>>
     suspend fun getPersonnelsAvailability(userGroup: String): Flow<ResultResponse<PersonnelAvailabilityResponse>>
+    suspend fun postAssignTicket(
+        username: String,
+        ticketId: Int
+    ): Flow<ResultResponse<AssignTicketResponse>>
     suspend fun logout()
 }
 
@@ -141,6 +147,42 @@ class NetworkRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun postAssignTicket(
+        username: String,
+        ticketId: Int
+    ): Flow<ResultResponse<AssignTicketResponse>> = flow {
+        val response =
+            api.postAssignTicket(AssignTicketRequest(username = username, ticketId = ticketId))
+
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            404 -> {
+                response.errorBody().toErrorResponseValue().let {
+                    emit(
+                        ResultResponse.Success(
+                            AssignTicketResponse(
+                                messages = it.messages.orEmpty(),
+                                success = it.success ?: false,
+                            )
+                        )
+                    )
+                }
+            }
+
+            401 -> {
+                emit(
+                    ResultResponse.UnAuthorized(
+                        ErrorResponse(
+                            code = response.code(),
+                            message = response.errorBody()
+                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
+                        )
+                    )
+                )
+            }
+        }
+    }
 
     override suspend fun logout() {
         sharedPreferences.edit().clear().apply()

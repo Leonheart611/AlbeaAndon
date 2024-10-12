@@ -52,11 +52,33 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
                 adapter.submitList(it, viewModel.isNotSameUserGroup)
             }
         }
+        viewModel.isNotAuthorized.observe(viewLifecycleOwner) {
+            if (it) showMessageDialog(
+                title = getString(R.string.unauthorized_title),
+                message = getString(R.string.unauthorized_desc),
+                buttonText = getString(R.string.unauthorized_button_label)
+            ) { navigateToLogin() }
+        }
+        viewModel.assignResult.observe(viewLifecycleOwner) {
+            if (it) {
+                showMessageDialog(
+                    title = getString(R.string.assign_success_title),
+                    message = getString(
+                        R.string.assign_success_desc,
+                        viewModel.selectedPersonnel?.userName.orEmpty()
+                    ),
+                    buttonText = getString(R.string.assign_success_button_label)
+                ) { findNavController().popBackStack() }
+            }
+        }
         nfcViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
             if (it == args.ticketData.rfid) {
-                // TODO: Setup Assign Ticket API ^-^
+                viewModel.postAssignTicket(
+                    username = viewModel.selectedPersonnel?.userName.orEmpty(),
+                    ticketId = args.ticketData.ticketID
+                )
             } else {
-                showErrorMessage(
+                showMessageDialog(
                     title = getString(R.string.nfc_verify_fail_title),
                     message = getString(R.string.nfc_verify_fail_desc, it),
                     buttonText = getString(R.string.nfc_verify_fail_button_label)
@@ -87,7 +109,7 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
                 dialogFragment.setCancelable(false)
                 dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
             } else {
-                showErrorMessage(
+                showMessageDialog(
                     title = getString(R.string.assign_personnel_not_selected_label),
                     message = getString(R.string.assign_personnel_not_selected_desc),
                     buttonText = getString(R.string.assign_personnel_not_selected_button_label)
@@ -113,6 +135,11 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
     private fun setupAdapter() = with(binding) {
         rvAssingPersonnellist.adapter = adapter
         rvAssingPersonnellist.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun navigateToLogin() {
+        viewModel.logout()
+        findNavController().navigate(AssignFragmentDirections.actionAssignFragmentToLoginFragment())
     }
 
     override fun onClickListener(item: PersonnelData) {

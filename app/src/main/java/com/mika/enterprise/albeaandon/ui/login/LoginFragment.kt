@@ -41,7 +41,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             if (it) showLoadingDialog() else hideLoadingDialog()
         }
         viewModel.errorMessage.observe(viewLifecycleOwner, EventObserver {
-            showErrorMessage(it) {
+            showMessageDialog(it) {
 
             }
         })

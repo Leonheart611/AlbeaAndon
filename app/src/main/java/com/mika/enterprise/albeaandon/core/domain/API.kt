@@ -1,6 +1,8 @@
 package com.mika.enterprise.albeaandon.core.domain
 
+import com.mika.enterprise.albeaandon.core.model.request.AssignTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
+import com.mika.enterprise.albeaandon.core.model.response.AssignTicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelAvailabilityResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
@@ -31,5 +33,10 @@ interface API {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20
     ): Response<PersonnelAvailabilityResponse>
+
+    @POST("/api/tickets/assign")
+    suspend fun postAssignTicket(
+        @Body param: AssignTicketRequest
+    ): Response<AssignTicketResponse>
 
 }

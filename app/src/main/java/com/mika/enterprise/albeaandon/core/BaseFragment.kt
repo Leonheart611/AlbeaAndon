@@ -42,7 +42,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         loadingDialog?.dismiss()
     }
 
-    fun showErrorMessage(errorResponse: ErrorResponse, onRetry: () -> Unit) {
+    fun showMessageDialog(errorResponse: ErrorResponse, onRetry: () -> Unit) {
         val dialog = MessageDialog(requireContext())
         dialog.setTitle("Failed Retrieve Connection Error ${errorResponse.code}")
         dialog.setMessage("${errorResponse.message}")
@@ -53,7 +53,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         dialog.show()
     }
 
-    fun showErrorMessage(title: String, message: String, buttonText: String, onRetry: () -> Unit) {
+    fun showMessageDialog(title: String, message: String, buttonText: String, onRetry: () -> Unit) {
         val dialog = MessageDialog(requireContext())
         dialog.setTitle(title)
         dialog.setMessage(message)
