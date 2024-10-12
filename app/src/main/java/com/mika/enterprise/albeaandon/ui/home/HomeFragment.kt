@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
+import com.mika.enterprise.albeaandon.core.util.Constant.SPV_PRODUCTION
 import com.mika.enterprise.albeaandon.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,6 +48,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
                     message = getString(R.string.unauthorized_desc),
                     buttonText = getString(R.string.unauthorized_button_label)
                 ) { logOut() }
+        }
+        viewModel.showEmptyState.observe(viewLifecycleOwner) {
+            binding.emptyState.root.visibility = if (it) View.VISIBLE else View.GONE
+            binding.rvTicketList.visibility = if (it) View.GONE else View.VISIBLE
         }
         binding.tbHome.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -87,8 +92,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
     }
 
     override fun onClickListener(item: TicketData) {
-        val action = HomeFragmentDirections.actionHomeFragmentToAssignFragment(item)
-        findNavController().navigate(action)
+        if (viewModel.jobPosition == SPV_PRODUCTION) {
+            val action = HomeFragmentDirections.actionHomeFragmentToAssignFragment(item)
+            findNavController().navigate(action)
+        } else {
+            showMessageDialog(
+                title = "Under Construction",
+                message = "This feature is under construction, lagi collect data yang di butuhin juga wkwkwk ^_^",
+                buttonText = "Ok, Sip"
+            ) {}
+        }
     }
 
 }

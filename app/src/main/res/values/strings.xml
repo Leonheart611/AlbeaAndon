@@ -11,6 +11,7 @@
     <string name="unauthorized_desc">You are not authorized, your token has expired please login again</string>
     <string name="unauthorized_button_label">OK</string>
 
+    <string name="ticket_empty_state_desc">No Ticket Found, seems all work are done, Good Job ^_^</string>
     <string name="ticket_id_label">Ticket No: %1$s</string>
     <string name="ticket_status_label">%1$s</string>
     <string name="ticket_machine_label">Machine No: %1$s</string>

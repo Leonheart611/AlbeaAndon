@@ -11,8 +11,11 @@ import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
 import com.mika.enterprise.albeaandon.core.repository.UserRepository
 import com.mika.enterprise.albeaandon.core.util.Constant.ASSIGNED
 import com.mika.enterprise.albeaandon.core.util.Constant.ESKALASI
+import com.mika.enterprise.albeaandon.core.util.Constant.MECHANIC
 import com.mika.enterprise.albeaandon.core.util.Constant.NEW
 import com.mika.enterprise.albeaandon.core.util.Constant.ONPROG
+import com.mika.enterprise.albeaandon.core.util.Constant.OPERATOR_BAHAN
+import com.mika.enterprise.albeaandon.core.util.Constant.SPV_PRODUCTION
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -30,11 +33,13 @@ class HomeViewModel @Inject constructor(
 
     val username = MutableLiveData<String>()
     val showLoading = MutableLiveData<Boolean>()
+    val showEmptyState = MutableLiveData<Boolean>()
     val isNotAuthorized = MutableLiveData<Boolean>()
     val pageNext = MutableLiveData<Boolean>()
 
     var currentPage = 1
     var maxPage = 0
+    var jobPosition = ""
 
     fun getUserName() {
         viewModelScope.launch { username.postValue(userRepository.login()?.username) }
@@ -55,13 +60,18 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is ResultResponse.Success -> {
-                        _ticketResult.value = it.data.data
-                        currentPage = currentPage++
-                        if (maxPage == 0) {
-                            val totalPage = it.data.page.total / it.data.page.limit
-                            maxPage = ceil(totalPage.toDouble()).toInt()
+                        if (it.data.data.isEmpty()) showEmptyState.postValue(true)
+                        else {
+                            showEmptyState.postValue(false)
+                            _ticketResult.value = it.data.data
+                            currentPage = currentPage++
+                            if (maxPage == 0) {
+                                val totalPage = it.data.page.total / it.data.page.limit
+                                maxPage = ceil(totalPage.toDouble()).toInt()
+                            }
+                            pageNext.postValue(currentPage < maxPage)
                         }
-                        pageNext.postValue(currentPage < maxPage)
+
                     }
 
                     is ResultResponse.UnAuthorized -> isNotAuthorized.postValue(true)
@@ -72,9 +82,10 @@ class HomeViewModel @Inject constructor(
 
 
     private fun getFilterMapping(jobPosition: String): List<String> {
+        this.jobPosition = jobPosition
         return when (jobPosition) {
-            "SPV Production" -> listOf(ONPROG, NEW, ESKALASI)
-            "Mechanic", "OperatorBahan" -> listOf(ASSIGNED, ONPROG)
+            SPV_PRODUCTION -> listOf(ONPROG, NEW, ESKALASI)
+            MECHANIC, OPERATOR_BAHAN -> listOf(ASSIGNED, ONPROG)
             else -> listOf()
         }
     }

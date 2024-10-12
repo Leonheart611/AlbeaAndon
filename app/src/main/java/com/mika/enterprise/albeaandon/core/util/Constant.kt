@@ -8,7 +8,9 @@ object Constant {
     const val ONPROG = "ONPROG"
     const val ESKALASI = "ESKALASI"
     const val ASSIGNED = "ASSIGNED"
-
+    const val SPV_PRODUCTION = "SPV Production"
+    const val MECHANIC = "Mechanic"
+    const val OPERATOR_BAHAN = "OperatorBahan"
 
     val userGroups = listOf("A", "B", "C", "D")
 }
