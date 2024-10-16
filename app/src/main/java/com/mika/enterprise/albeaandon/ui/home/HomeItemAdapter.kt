@@ -2,13 +2,14 @@ package com.mika.enterprise.albeaandon.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
 import com.mika.enterprise.albeaandon.core.util.convertDateIntoLocalDateTime
+import com.mika.enterprise.albeaandon.core.util.mappingColors
 import com.mika.enterprise.albeaandon.core.util.orEmptyDash
 import com.mika.enterprise.albeaandon.databinding.HomeViewItemBinding
 
@@ -60,21 +61,11 @@ class HomeItemAdapter(val listener: OnHomeItemClicked? = null) :
                 tvTicketMachineloc.text =
                     view.context.getString(R.string.ticket_machine_loc_label, item.mchLoc)
                 tvTicketStatus.setTextColor(
-                    ContextCompat.getColor(
-                        itemView.context,
-                        mappingColors(item.ticketStatus)
+                    getColor(
+                        itemView.context, mappingColors(item.ticketStatus)
                     )
                 )
                 root.setOnClickListener { listener?.onClickListener(item) }
-            }
-        }
-
-        fun mappingColors(status: String): Int {
-            return when (status) {
-                "NEW" -> R.color.new_color
-                "ONPROG" -> R.color.in_progress_color
-                "CLOSED" -> R.color.close_color
-                else -> R.color.new_color
             }
         }
     }

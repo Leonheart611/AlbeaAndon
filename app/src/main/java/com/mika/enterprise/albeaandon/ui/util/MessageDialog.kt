@@ -13,7 +13,9 @@ class MessageDialog(context: Context) : BottomSheetDialog(context) {
     }
 
     init {
-        setContentView(binding.root)
+        setContentView(binding.root).apply {
+            setCanceledOnTouchOutside(false)
+        }
     }
 
     fun setTitle(title: String) {

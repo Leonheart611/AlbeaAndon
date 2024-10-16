@@ -6,14 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelData
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
+import com.mika.enterprise.albeaandon.core.repository.UserRepository
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
+import com.mika.enterprise.albeaandon.core.util.mappingAssignFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AssignViewModel @Inject constructor(
-    val networkRepository: NetworkRepository
+    val networkRepository: NetworkRepository,
+    val userRepository: UserRepository
 ) : ViewModel() {
 
     val showLoading = MutableLiveData<Boolean>()
@@ -29,26 +32,25 @@ class AssignViewModel @Inject constructor(
 
     fun getPersonnelList(userGroup: String) {
         viewModelScope.launch {
+            val userDept = userRepository.login()?.userDept.orEmpty()
             showLoading.postValue(true)
             isNotSameUserGroup = currentUserGroup != userGroup
-            networkRepository.getPersonnelsAvailability(userGroup).collect {
-                showLoading.postValue(false)
-                when (it) {
-                    is ResultResponse.Error -> {
+            networkRepository.getPersonnelsAvailability(userGroup, mappingAssignFilter(userDept))
+                .collect {
+                    showLoading.postValue(false)
+                    when (it) {
+                        is ResultResponse.Error -> {}
+                        is ResultResponse.Success -> {
+                            if (isNotSameUserGroup) selectedPersonnel = null
+                            _personnelList.postValue(it.data.data)
+                            currentUserGroup = userGroup
+                        }
 
-                    }
-
-                    is ResultResponse.Success -> {
-                        if (isNotSameUserGroup) selectedPersonnel = null
-                        _personnelList.postValue(it.data.data)
-                        currentUserGroup = userGroup
-                    }
-
-                    is ResultResponse.UnAuthorized -> {
-                        isNotAuthorized.postValue(true)
+                        is ResultResponse.UnAuthorized -> {
+                            isNotAuthorized.postValue(true)
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -78,5 +80,4 @@ class AssignViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch { networkRepository.logout() }
     }
-
 }

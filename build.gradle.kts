@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.hilt.plugin) apply false
     alias(libs.plugins.ksp.plugin) apply false
     id("androidx.navigation.safeargs.kotlin") version "2.8.0" apply false
+    id("com.google.firebase.appdistribution") version "5.0.0" apply false
 }

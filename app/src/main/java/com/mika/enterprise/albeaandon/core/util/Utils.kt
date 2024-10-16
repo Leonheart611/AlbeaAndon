@@ -4,6 +4,9 @@ import android.content.Context
 import android.widget.Toast
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
+import com.mika.enterprise.albeaandon.R
+import com.mika.enterprise.albeaandon.core.util.Constant.SPV_PRODUCTION
+import com.mika.enterprise.albeaandon.core.util.Constant.spvUserDeptFilter
 import okhttp3.ResponseBody
 import java.time.Instant
 import java.time.ZoneId
@@ -37,4 +40,23 @@ fun String.convertDateIntoLocalDateTime(): String {
 
 fun Context.showToast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+}
+
+fun mappingColors(status: String): Int {
+    return when (status) {
+        "NEW" -> R.color.new_color
+        "ONPROG" -> R.color.in_progress_color
+        "ASSIGNED" -> R.color.assigned_color
+        "CLOSED" -> R.color.close_color
+        else -> R.color.new_color
+    }
+}
+
+fun mappingAssignFilter(userDept: String): String {
+    return when(userDept){
+        SPV_PRODUCTION -> spvUserDeptFilter
+        "Mechanic" -> "MECHANIC"
+        "OperatorBahan" -> "OPERATOR_BAHAN"
+        else -> ""
+    }
 }

@@ -6,6 +6,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp.plugin)
+    id("com.google.firebase.appdistribution")
 }
 
 android {

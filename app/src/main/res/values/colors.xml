@@ -5,6 +5,7 @@
     <color name="lightCyan">#E0FFFF</color>
     <color name="new_color">#D50000</color>"
     <color name="in_progress_color">#FFC107</color>
+    <color name="assigned_color">#03A9F4</color>
     <color name="close_color">#4CAF50</color>
     <color name="selected_card_color">#C8E6C9</color>
 </resources>

@@ -13,4 +13,7 @@ object Constant {
     const val OPERATOR_BAHAN = "OperatorBahan"
 
     val userGroups = listOf("A", "B", "C", "D")
+    val spvUserDeptFilter = listOf("Mechanic", "OperatorBahan").joinToString(",")
+
+
 }

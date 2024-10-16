@@ -7,6 +7,8 @@ import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
 import com.mika.enterprise.albeaandon.core.model.response.AssignTicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelAvailabilityResponse
+import com.mika.enterprise.albeaandon.core.model.response.ProblemGroupResponse
+import com.mika.enterprise.albeaandon.core.model.response.ProblemTodo
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.toUser
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_TOKEN
@@ -20,11 +22,27 @@ import javax.inject.Inject
 interface NetworkRepository {
     suspend fun login(username: String, password: String): Flow<ResultResponse<LoginResponse>>
     suspend fun getTickets(status: String, page: Int): Flow<ResultResponse<TicketResponse>>
-    suspend fun getPersonnelsAvailability(userGroup: String): Flow<ResultResponse<PersonnelAvailabilityResponse>>
+    suspend fun getPersonnelsAvailability(
+        userGroup: String,
+        userDept: String
+    ): Flow<ResultResponse<PersonnelAvailabilityResponse>>
+
     suspend fun postAssignTicket(
         username: String,
         ticketId: Int
     ): Flow<ResultResponse<AssignTicketResponse>>
+
+    suspend fun getProblemGroup(isEscalated: Int = 0): Flow<ResultResponse<ProblemGroupResponse>>
+    suspend fun getProblem(
+        problemGroupId: Int,
+        isEscalated: Int = 0
+    ): Flow<ResultResponse<ProblemGroupResponse>>
+
+    suspend fun getTodoProblem(
+        problemId: Int,
+        isEscalated: Int = 0
+    ): Flow<ResultResponse<ProblemTodo>>
+
     suspend fun logout()
 }
 
@@ -116,9 +134,12 @@ class NetworkRepositoryImpl @Inject constructor(
         }
 
 
-    override suspend fun getPersonnelsAvailability(userGroup: String): Flow<ResultResponse<PersonnelAvailabilityResponse>> =
+    override suspend fun getPersonnelsAvailability(
+        userGroup: String,
+        userDept: String
+    ): Flow<ResultResponse<PersonnelAvailabilityResponse>> =
         flow {
-            val response = api.getPersonnelsAvailability(userGroup = userGroup)
+            val response = api.getPersonnelsAvailability(userGroup = userGroup, userDept = userDept)
             when (response.code()) {
                 200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
                 401 -> {
@@ -162,6 +183,108 @@ class NetworkRepositoryImpl @Inject constructor(
                     emit(
                         ResultResponse.Success(
                             AssignTicketResponse(
+                                messages = it.messages.orEmpty(),
+                                success = it.success ?: false,
+                            )
+                        )
+                    )
+                }
+            }
+
+            401 -> {
+                emit(
+                    ResultResponse.UnAuthorized(
+                        ErrorResponse(
+                            code = response.code(),
+                            message = response.errorBody()
+                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+
+    override suspend fun getProblemGroup(isEscalated: Int): Flow<ResultResponse<ProblemGroupResponse>> =
+        flow {
+            val response = api.getProblemGroup(isEscalated = isEscalated)
+            when (response.code()) {
+                200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+                404 -> {
+                    response.errorBody().toErrorResponseValue().let {
+                        emit(
+                            ResultResponse.Success(
+                                ProblemGroupResponse(
+                                    messages = it.messages.orEmpty(),
+                                    success = it.success ?: false,
+                                )
+                            )
+                        )
+                    }
+                }
+
+                401 -> {
+                    emit(
+                        ResultResponse.UnAuthorized(
+                            ErrorResponse(
+                                code = response.code(),
+                                message = response.errorBody()
+                                    .toErrorResponseValue().messages?.firstOrNull().orEmpty()
+                            )
+                        )
+                    )
+                }
+
+            }
+        }
+
+    override suspend fun getProblem(
+        problemGroupId: Int,
+        isEscalated: Int
+    ): Flow<ResultResponse<ProblemGroupResponse>> = flow {
+        val response = api.getProblem(problemGroupId = problemGroupId, isEscalated = isEscalated)
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            404 -> {
+                response.errorBody().toErrorResponseValue().let {
+                    emit(
+                        ResultResponse.Success(
+                            ProblemGroupResponse(
+                                messages = it.messages.orEmpty(),
+                                success = it.success ?: false,
+                            )
+                        )
+                    )
+                }
+            }
+
+            401 -> {
+                emit(
+                    ResultResponse.UnAuthorized(
+                        ErrorResponse(
+                            code = response.code(),
+                            message = response.errorBody()
+                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    override suspend fun getTodoProblem(
+        problemId: Int,
+        isEscalated: Int
+    ): Flow<ResultResponse<ProblemTodo>> = flow {
+        val response = api.getTodoProblem(problemId, isEscalated)
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            404 -> {
+                response.errorBody().toErrorResponseValue().let {
+                    emit(
+                        ResultResponse.Success(
+                            ProblemTodo(
                                 messages = it.messages.orEmpty(),
                                 success = it.success ?: false,
                             )

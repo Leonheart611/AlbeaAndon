@@ -39,4 +39,17 @@
     <string name="assign_success_title">Success Assign Ticket</string>
     <string name="assign_success_desc">Success assign ticket to %1$s</string>
     <string name="assign_success_button_label">OK</string>
+    <string name="problem_title_label">Assigned Ticket</string>
+    <string name="problem_group_label">Problem Group</string>
+    <string name="problem_group_hint_label">Select Problem Group</string>
+    <string name="problem_label">Problem</string>
+    <string name="problem_hint_label">Select Problem</string>
+    <string name="problem_todo_plan_label">Todo Plan</string>
+    <string name="problem_todo_plan_hint_label">Select Todo Plan</string>
+    <string name="problem_action_button_submit_label">Submit</string>
+    <string name="problem_action_button_help_label">Help</string>
+    <string name="problem_action_button_escalation_label">Escalation</string>
+    <string name="problem_action_button_done_label">Done</string>
+    <string name="problem_error_no_previous_value">Please Select Previous Value</string>
+    <string name="problem_error_no_previous_value_action">Okay Understand</string>
 </resources>
