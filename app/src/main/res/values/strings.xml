@@ -19,6 +19,7 @@
     <string name="ticket_problem_label">Problem: %1$s</string>
     <string name="ticket_date_label">Create Date: %1$s</string>"
     <string name="ticket_machine_loc_label">Machine Loc: %1$s</string>"
+    <string name="ticket_action_plan_label">Action Plan: %1$s</string>
     <string name="home_title_label">Hi, %1$s</string>
     <string name="assign_title_label">Assign Ticket</string>
     <string name="assign_button_label">Assign Personnel</string>
@@ -46,10 +47,24 @@
     <string name="problem_hint_label">Select Problem</string>
     <string name="problem_todo_plan_label">Todo Plan</string>
     <string name="problem_todo_plan_hint_label">Select Todo Plan</string>
+    <string name="problem_assign_ticket_date">Assign Date: %1$s</string>
     <string name="problem_action_button_submit_label">Submit</string>
     <string name="problem_action_button_help_label">Help</string>
     <string name="problem_action_button_escalation_label">Escalation</string>
     <string name="problem_action_button_done_label">Done</string>
     <string name="problem_error_no_previous_value">Please Select Previous Value</string>
     <string name="problem_error_no_previous_value_action">Okay Understand</string>
+    <string name="problem_error_no_todo_id_selected">Please Select Todo Plan to Continue</string>
+    <string name="problem_error_no_todo_id_selected_action">Okay Understand</string>
+    <string name="onprogress_success_title">Success Change Ticket Status</string>
+    <string name="onprogress_success_button_label">OK</string>
+    <string name="escalation_title_label">Escalation</string>
+    <string name="escalation_message_hint_label">Escalation Message</string>
+    <string name="escalation_button_label">Escalate</string>
+    <string name="escalation_error_no_message">Please Enter Escalation Message</string>
+    <string name="finalize_notify_done_ticket_success">Success Notify Done Ticket</string>
+    <string name="finalize_notify_help_ticket_success">Success Request Help Ticket</string>
+    <string name="finalize_escalation_ticket_success">Success Escalation Ticket</string>
+    <string name="finalize_success_button_label">Okay</string>
+    <string name="finalize_title_label">Update Progress Ticket</string>
 </resources>

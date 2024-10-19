@@ -16,6 +16,7 @@ import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelData
+import com.mika.enterprise.albeaandon.core.util.Constant.IS_INTERNAL_TEST
 import com.mika.enterprise.albeaandon.core.util.Constant.userGroups
 import com.mika.enterprise.albeaandon.core.util.EventObserver
 import com.mika.enterprise.albeaandon.core.util.convertDateIntoLocalDateTime
@@ -72,7 +73,7 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
             }
         }
         nfcViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
-            if (it == args.ticketData.rfid) {
+            if (it == args.ticketData.rfid || IS_INTERNAL_TEST) {
                 viewModel.postAssignTicket(
                     username = viewModel.selectedPersonnel?.userName.orEmpty(),
                     ticketId = args.ticketData.ticketID

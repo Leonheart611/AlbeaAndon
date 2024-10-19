@@ -15,6 +15,7 @@ class MessageDialog(context: Context) : BottomSheetDialog(context) {
     init {
         setContentView(binding.root).apply {
             setCanceledOnTouchOutside(false)
+            behavior.isHideable = false
         }
     }
 

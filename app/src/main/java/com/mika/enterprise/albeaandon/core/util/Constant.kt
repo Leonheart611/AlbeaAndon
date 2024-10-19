@@ -15,5 +15,6 @@ object Constant {
     val userGroups = listOf("A", "B", "C", "D")
     val spvUserDeptFilter = listOf("Mechanic", "OperatorBahan").joinToString(",")
 
+    const val IS_INTERNAL_TEST = true
 
 }

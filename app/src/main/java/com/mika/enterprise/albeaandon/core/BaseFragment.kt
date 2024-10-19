@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.util.ErrorResponse
 import com.mika.enterprise.albeaandon.ui.util.LoadingDialog
 import com.mika.enterprise.albeaandon.ui.util.MessageDialog
@@ -59,6 +60,17 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         dialog.setMessage(message)
         dialog.setActionButton(buttonText) {
             onRetry()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    fun showTokenExpiredDialog(nextAction: () -> Unit) {
+        val dialog = MessageDialog(requireContext())
+        dialog.setTitle(getString(R.string.unauthorized_title))
+        dialog.setMessage(getString(R.string.unauthorized_desc))
+        dialog.setActionButton(getString(R.string.unauthorized_button_label)) {
+            nextAction()
             dialog.dismiss()
         }
         dialog.show()

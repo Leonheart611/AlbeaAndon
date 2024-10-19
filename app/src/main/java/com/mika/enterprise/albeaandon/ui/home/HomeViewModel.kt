@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
 import com.mika.enterprise.albeaandon.core.repository.UserRepository
@@ -54,11 +53,7 @@ class HomeViewModel @Inject constructor(
             ).collect {
                 showLoading.postValue(false)
                 when (it) {
-                    is ResultResponse.Error -> {
-                        FirebaseCrashlytics.getInstance()
-                            .recordException(it.exception ?: Exception("Unknown error"))
-                    }
-
+                    is ResultResponse.Error -> {}
                     is ResultResponse.Success -> {
                         if (it.data.data.isEmpty()) showEmptyState.postValue(true)
                         else {
@@ -73,8 +68,8 @@ class HomeViewModel @Inject constructor(
                         }
 
                     }
-
                     is ResultResponse.UnAuthorized -> isNotAuthorized.postValue(true)
+                    is ResultResponse.EmptyOrNotFound -> showEmptyState.postValue(true)
                 }
             }
         }

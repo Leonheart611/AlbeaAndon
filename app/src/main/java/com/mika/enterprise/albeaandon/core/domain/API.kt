@@ -1,12 +1,17 @@
 package com.mika.enterprise.albeaandon.core.domain
 
 import com.mika.enterprise.albeaandon.core.model.request.AssignTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.CloseTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.EscalateTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
+import com.mika.enterprise.albeaandon.core.model.request.NotifyTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.OnprogTicketRequest
 import com.mika.enterprise.albeaandon.core.model.response.AssignTicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelAvailabilityResponse
 import com.mika.enterprise.albeaandon.core.model.response.ProblemGroupResponse
 import com.mika.enterprise.albeaandon.core.model.response.ProblemTodo
+import com.mika.enterprise.albeaandon.core.model.response.TicketGeneralResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -27,6 +32,9 @@ interface API {
         @Query("page") page: Int,
         @Query("limit") limit: Int
     ): Response<TicketResponse>
+
+    @GET("/api/tickets")
+    suspend fun getTicketDetail(@Query("id") id: Int): Response<TicketResponse>
 
     @GET("/api/tickets/personnels")
     suspend fun getPersonnelsAvailability(
@@ -66,4 +74,19 @@ interface API {
         @Query("limit") limit: Int = 100
     ): Response<ProblemTodo>
 
+    @Headers("Content-Type: application/json")
+    @POST("/api/tickets/onprog")
+    suspend fun postOnProgressTicket(@Body param: OnprogTicketRequest): Response<TicketGeneralResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("/api/tickets/escalate")
+    suspend fun postEscalateTicket(@Body param: EscalateTicketRequest): Response<TicketGeneralResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("/api/tickets/close")
+    suspend fun postCloseTicket(@Body param: CloseTicketRequest): Response<TicketGeneralResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("/api/tickets/notify")
+    suspend fun postNotifyTicket(@Body param: NotifyTicketRequest): Response<TicketGeneralResponse>
 }

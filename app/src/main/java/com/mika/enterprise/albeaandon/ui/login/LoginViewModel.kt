@@ -1,11 +1,9 @@
 package com.mika.enterprise.albeaandon.ui.login
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
 import com.mika.enterprise.albeaandon.core.util.ErrorResponse
@@ -39,9 +37,6 @@ class LoginViewModel @Inject constructor(
 
                     is ResultResponse.Error -> {
                         _showLoading.postValue(false)
-                        Log.e("LoginViewModel", "Error logging in", it.exception)
-                        FirebaseCrashlytics.getInstance()
-                            .recordException(it.exception ?: Exception("Unknown error"))
                         errorMessage.postValue(Event(it.errorResponse))
                     }
 
@@ -49,13 +44,13 @@ class LoginViewModel @Inject constructor(
                         _showLoading.postValue(false)
                         errorMessage.postValue(Event(it.errorResponse))
                     }
+
+                    is ResultResponse.EmptyOrNotFound -> {
+                        _showLoading.postValue(false)
+                        errorMessage.postValue(Event(ErrorResponse(404, it.message)))
+                    }
                 }
             }
         }
     }
-
-    /*  fun updateNfcValue(value: String) {
-          _nfcValue.postValue(Event(value))
-      }*/
-
 }

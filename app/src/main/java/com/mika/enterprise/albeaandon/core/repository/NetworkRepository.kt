@@ -3,18 +3,24 @@ package com.mika.enterprise.albeaandon.core.repository
 import android.content.SharedPreferences
 import com.mika.enterprise.albeaandon.core.domain.API
 import com.mika.enterprise.albeaandon.core.model.request.AssignTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.CloseTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.EscalateTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
+import com.mika.enterprise.albeaandon.core.model.request.NotifyTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.OnprogTicketRequest
 import com.mika.enterprise.albeaandon.core.model.response.AssignTicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.LoginResponse
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelAvailabilityResponse
 import com.mika.enterprise.albeaandon.core.model.response.ProblemGroupResponse
 import com.mika.enterprise.albeaandon.core.model.response.ProblemTodo
+import com.mika.enterprise.albeaandon.core.model.response.TicketGeneralResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.toUser
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_TOKEN
-import com.mika.enterprise.albeaandon.core.util.ErrorResponse
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
-import com.mika.enterprise.albeaandon.core.util.toErrorResponseValue
+import com.mika.enterprise.albeaandon.core.util.handleGenericError
+import com.mika.enterprise.albeaandon.core.util.handleNotFoundError
+import com.mika.enterprise.albeaandon.core.util.handleUnauthorizedError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -22,6 +28,7 @@ import javax.inject.Inject
 interface NetworkRepository {
     suspend fun login(username: String, password: String): Flow<ResultResponse<LoginResponse>>
     suspend fun getTickets(status: String, page: Int): Flow<ResultResponse<TicketResponse>>
+    suspend fun getTicketDetail(ticketId: Int): Flow<ResultResponse<TicketResponse>>
     suspend fun getPersonnelsAvailability(
         userGroup: String,
         userDept: String
@@ -42,6 +49,23 @@ interface NetworkRepository {
         problemId: Int,
         isEscalated: Int = 0
     ): Flow<ResultResponse<ProblemTodo>>
+
+    suspend fun postOnProgressTicket(
+        ticketId: Int,
+        todoId: Int
+    ): Flow<ResultResponse<TicketGeneralResponse>>
+
+    suspend fun postEscalateTicket(
+        ticketId: Int,
+        message: String
+    ): Flow<ResultResponse<TicketGeneralResponse>>
+
+    suspend fun postCloseTicket(ticketId: Int): Flow<ResultResponse<TicketGeneralResponse>>
+    suspend fun postNotifyTicket(
+        ticketId: Int,
+        isHelp: Int,
+        isDone: Int
+    ): Flow<ResultResponse<TicketGeneralResponse>>
 
     suspend fun logout()
 }
@@ -67,34 +91,9 @@ class NetworkRepositoryImpl @Inject constructor(
                     }
                 }
 
-                401 -> {
-                    emit(
-                        ResultResponse.UnAuthorized(
-                            ErrorResponse(
-                                code = response.code(),
-                                message = response.errorBody()
-                                    .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                            )
-                        )
-                    )
-                }
-
-                404 -> {
-                    response.body()?.let {
-                        emit(ResultResponse.Success(it))
-                    } ?: run {
-                        emit(
-                            ResultResponse.Error(
-                                Exception(
-                                    "Error Login -- ${response.code()} -- ${
-                                        response.errorBody()?.string()
-                                    }"
-                                ),
-                                ErrorResponse(code = response.code(), message = response.message())
-                            )
-                        )
-                    }
-                }
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
             }
         }
 
@@ -103,36 +102,25 @@ class NetworkRepositoryImpl @Inject constructor(
         page: Int
     ): Flow<ResultResponse<TicketResponse>> =
         flow {
-            val response = api.getTickets(status = status, page, 20)
+            val response = api.getTickets(status = status, page = page, limit = 20)
             when (response.code()) {
                 200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-                401 -> {
-                    emit(
-                        ResultResponse.UnAuthorized(
-                            ErrorResponse(
-                                code = response.code(),
-                                message = response.errorBody()
-                                    .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                            )
-                        )
-                    )
-                }
-
-                404 -> {
-                    response.errorBody().toErrorResponseValue().let {
-                        emit(
-                            ResultResponse.Success(
-                                TicketResponse(
-                                    messages = it.messages.orEmpty(),
-                                    success = it.success ?: false,
-                                )
-                            )
-                        )
-                    }
-                }
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
             }
         }
 
+    override suspend fun getTicketDetail(ticketId: Int): Flow<ResultResponse<TicketResponse>> =
+        flow {
+            val response = api.getTicketDetail(ticketId)
+            when (response.code()) {
+                200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
+            }
+        }
 
     override suspend fun getPersonnelsAvailability(
         userGroup: String,
@@ -142,30 +130,9 @@ class NetworkRepositoryImpl @Inject constructor(
             val response = api.getPersonnelsAvailability(userGroup = userGroup, userDept = userDept)
             when (response.code()) {
                 200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-                401 -> {
-                    emit(
-                        ResultResponse.UnAuthorized(
-                            ErrorResponse(
-                                code = response.code(),
-                                message = response.errorBody()
-                                    .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                            )
-                        )
-                    )
-                }
-
-                404 -> {
-                    response.errorBody().toErrorResponseValue().let {
-                        emit(
-                            ResultResponse.Success(
-                                PersonnelAvailabilityResponse(
-                                    messages = it.messages.orEmpty(),
-                                    success = it.success ?: false,
-                                )
-                            )
-                        )
-                    }
-                }
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
             }
         }
 
@@ -178,30 +145,9 @@ class NetworkRepositoryImpl @Inject constructor(
 
         when (response.code()) {
             200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-            404 -> {
-                response.errorBody().toErrorResponseValue().let {
-                    emit(
-                        ResultResponse.Success(
-                            AssignTicketResponse(
-                                messages = it.messages.orEmpty(),
-                                success = it.success ?: false,
-                            )
-                        )
-                    )
-                }
-            }
-
-            401 -> {
-                emit(
-                    ResultResponse.UnAuthorized(
-                        ErrorResponse(
-                            code = response.code(),
-                            message = response.errorBody()
-                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                        )
-                    )
-                )
-            }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
         }
     }
 
@@ -211,31 +157,9 @@ class NetworkRepositoryImpl @Inject constructor(
             val response = api.getProblemGroup(isEscalated = isEscalated)
             when (response.code()) {
                 200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-                404 -> {
-                    response.errorBody().toErrorResponseValue().let {
-                        emit(
-                            ResultResponse.Success(
-                                ProblemGroupResponse(
-                                    messages = it.messages.orEmpty(),
-                                    success = it.success ?: false,
-                                )
-                            )
-                        )
-                    }
-                }
-
-                401 -> {
-                    emit(
-                        ResultResponse.UnAuthorized(
-                            ErrorResponse(
-                                code = response.code(),
-                                message = response.errorBody()
-                                    .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                            )
-                        )
-                    )
-                }
-
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
             }
         }
 
@@ -246,30 +170,9 @@ class NetworkRepositoryImpl @Inject constructor(
         val response = api.getProblem(problemGroupId = problemGroupId, isEscalated = isEscalated)
         when (response.code()) {
             200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-            404 -> {
-                response.errorBody().toErrorResponseValue().let {
-                    emit(
-                        ResultResponse.Success(
-                            ProblemGroupResponse(
-                                messages = it.messages.orEmpty(),
-                                success = it.success ?: false,
-                            )
-                        )
-                    )
-                }
-            }
-
-            401 -> {
-                emit(
-                    ResultResponse.UnAuthorized(
-                        ErrorResponse(
-                            code = response.code(),
-                            message = response.errorBody()
-                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                        )
-                    )
-                )
-            }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
         }
     }
 
@@ -280,30 +183,65 @@ class NetworkRepositoryImpl @Inject constructor(
         val response = api.getTodoProblem(problemId, isEscalated)
         when (response.code()) {
             200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-            404 -> {
-                response.errorBody().toErrorResponseValue().let {
-                    emit(
-                        ResultResponse.Success(
-                            ProblemTodo(
-                                messages = it.messages.orEmpty(),
-                                success = it.success ?: false,
-                            )
-                        )
-                    )
-                }
-            }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
+        }
+    }
 
-            401 -> {
-                emit(
-                    ResultResponse.UnAuthorized(
-                        ErrorResponse(
-                            code = response.code(),
-                            message = response.errorBody()
-                                .toErrorResponseValue().messages?.firstOrNull().orEmpty()
-                        )
-                    )
-                )
+    override suspend fun postOnProgressTicket(
+        ticketId: Int,
+        todoId: Int
+    ): Flow<ResultResponse<TicketGeneralResponse>> = flow {
+        val response = api.postOnProgressTicket(
+            OnprogTicketRequest(
+                problemToDoId = todoId,
+                ticketId = ticketId
+            )
+        )
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
+        }
+    }
+
+    override suspend fun postEscalateTicket(
+        ticketId: Int,
+        message: String
+    ): Flow<ResultResponse<TicketGeneralResponse>> = flow {
+        val response = api.postEscalateTicket(EscalateTicketRequest(ticketId, message))
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
+        }
+    }
+
+    override suspend fun postCloseTicket(ticketId: Int): Flow<ResultResponse<TicketGeneralResponse>> =
+        flow {
+            val response = api.postCloseTicket(CloseTicketRequest(ticketId))
+            when (response.code()) {
+                200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+                401 -> emit(handleUnauthorizedError(response))
+                404 -> emit(handleNotFoundError(response))
+                else -> emit(handleGenericError(response))
             }
+        }
+
+    override suspend fun postNotifyTicket(
+        ticketId: Int,
+        isHelp: Int,
+        isDone: Int
+    ): Flow<ResultResponse<TicketGeneralResponse>> = flow {
+        val response = api.postNotifyTicket(NotifyTicketRequest(ticketId, isHelp, isDone))
+        when (response.code()) {
+            200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
+            401 -> emit(handleUnauthorizedError(response))
+            404 -> emit(handleNotFoundError(response))
+            else -> emit(handleGenericError(response))
         }
     }
 

@@ -49,6 +49,8 @@ class AssignViewModel @Inject constructor(
                         is ResultResponse.UnAuthorized -> {
                             isNotAuthorized.postValue(true)
                         }
+
+                        is ResultResponse.EmptyOrNotFound -> TODO()
                     }
                 }
         }
@@ -71,6 +73,8 @@ class AssignViewModel @Inject constructor(
                     is ResultResponse.UnAuthorized -> {
                         isNotAuthorized.postValue(true)
                     }
+
+                    is ResultResponse.EmptyOrNotFound -> {} // TODO: Add Empty State
                 }
             }
 

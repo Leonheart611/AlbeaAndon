@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
-import com.mika.enterprise.albeaandon.core.util.Constant.MECHANIC
-import com.mika.enterprise.albeaandon.core.util.Constant.SPV_PRODUCTION
+import com.mika.enterprise.albeaandon.core.util.Constant.ASSIGNED
+import com.mika.enterprise.albeaandon.core.util.Constant.NEW
+import com.mika.enterprise.albeaandon.core.util.Constant.ONPROG
 import com.mika.enterprise.albeaandon.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,14 +43,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
         viewModel.username.observe(viewLifecycleOwner) {
             binding.tbHome.title = getString(R.string.home_title_label, it)
         }
-        viewModel.isNotAuthorized.observe(viewLifecycleOwner) {
-            if (it)
-                showMessageDialog(
-                    title = getString(R.string.unauthorized_title),
-                    message = getString(R.string.unauthorized_desc),
-                    buttonText = getString(R.string.unauthorized_button_label)
-                ) { logOut() }
-        }
+        viewModel.isNotAuthorized.observe(viewLifecycleOwner) { if (it) showTokenExpiredDialog{ logOut() } }
         viewModel.showEmptyState.observe(viewLifecycleOwner) {
             binding.emptyState.root.visibility = if (it) View.VISIBLE else View.GONE
             binding.rvTicketList.visibility = if (it) View.GONE else View.VISIBLE
@@ -93,14 +87,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
     }
 
     override fun onClickListener(item: TicketData) {
-        when (viewModel.jobPosition) {
-            SPV_PRODUCTION -> {
+        when (item.ticketStatus) {
+            NEW -> {
                 val action = HomeFragmentDirections.actionHomeFragmentToAssignFragment(item)
                 findNavController().navigate(action)
             }
 
-            MECHANIC -> {
+            ASSIGNED -> {
                 val action = HomeFragmentDirections.actionHomeFragmentToProgressFragment(item)
+                findNavController().navigate(action)
+            }
+
+            ONPROG -> {
+                val action =
+                    HomeFragmentDirections.actionHomeFragmentToFinalizeFragment(ticketData = item)
                 findNavController().navigate(action)
             }
 

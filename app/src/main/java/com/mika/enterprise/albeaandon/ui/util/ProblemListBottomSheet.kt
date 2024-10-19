@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mika.enterprise.albeaandon.MainViewModel
+import com.mika.enterprise.albeaandon.core.model.response.ProblemGeneralResponse
 import com.mika.enterprise.albeaandon.core.util.Event
 import com.mika.enterprise.albeaandon.databinding.ProblemListBottomSheetBinding
 import com.mika.enterprise.albeaandon.ui.progress.ProblemAdapter
@@ -49,8 +50,17 @@ class ProblemListBottomSheet : BottomSheetDialogFragment() {
         val problemId = arguments?.getInt(PROBLEM_ID) ?: 0
         val adapter = ProblemAdapter {
             when (enumType) {
-                GROUP_PROBLEM -> activityViewModel.problemGroupValue.postValue(Event(it))
-                PROBLEM -> activityViewModel.problemValue.postValue(Event(it))
+                GROUP_PROBLEM -> {
+                    activityViewModel.problemGroupValue.postValue(Event(it))
+                    activityViewModel.problemValue.postValue(Event(ProblemGeneralResponse(0, "")))
+                    activityViewModel.todoValue.postValue(Event(ProblemGeneralResponse(0, "")))
+                }
+
+                PROBLEM -> {
+                    activityViewModel.problemValue.postValue(Event(it))
+                    activityViewModel.todoValue.postValue(Event(ProblemGeneralResponse(0, "")))
+                }
+
                 TODO -> activityViewModel.todoValue.postValue(Event(it))
                 null -> TODO()
             }
@@ -89,12 +99,10 @@ class ProblemListBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    fun setAdapter(adapter: ProblemAdapter) {
+    private fun setAdapter(adapter: ProblemAdapter) {
         binding.rvProblemList.adapter = adapter
         binding.rvProblemList.layoutManager = LinearLayoutManager(requireContext())
-        binding.tvProblemSearch.doAfterTextChanged {
-            adapter.filter.filter(it.toString())
-        }
+        binding.tvProblemSearch.doAfterTextChanged { adapter.filter.filter(it.toString()) }
     }
 
     companion object {
