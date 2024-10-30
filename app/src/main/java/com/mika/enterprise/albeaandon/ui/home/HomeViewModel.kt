@@ -39,6 +39,7 @@ class HomeViewModel @Inject constructor(
     var currentPage = 1
     var maxPage = 0
     var jobPosition = ""
+    var filteredStatus = ""
 
     fun getUserName() {
         viewModelScope.launch { username.postValue(userRepository.login()?.username) }
@@ -68,6 +69,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                     }
+
                     is ResultResponse.UnAuthorized -> isNotAuthorized.postValue(true)
                     is ResultResponse.EmptyOrNotFound -> showEmptyState.postValue(true)
                 }
@@ -95,4 +97,13 @@ class HomeViewModel @Inject constructor(
         return@switchMap ticketResult
     }
 
+    fun getFilterData(): MutableList<FilterData> {
+        val filterData = mutableListOf<FilterData>()
+        filterData.add(FilterData("ALL", true))
+        getFilterMapping(jobPosition).forEach {
+            filterData.add(FilterData(it))
+        }
+
+        return filterData
+    }
 }

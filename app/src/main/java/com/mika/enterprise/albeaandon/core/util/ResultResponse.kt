@@ -47,6 +47,13 @@ fun <T> handleGenericError(response: Response<T>): ResultResponse<T> {
     )
 }
 
+fun <T> handleGenericError(error: Exception): ResultResponse<T> {
+    FirebaseCrashlytics.getInstance().recordException(error)
+    return ResultResponse.Error(
+        ErrorResponse(code = 404, message = error.message.orEmpty())
+    )
+}
+
 fun <T> handleNotFoundError(response: Response<T>): ResultResponse<T> {
     return response.errorBody().toErrorResponseValue().let {
         ResultResponse.EmptyOrNotFound(

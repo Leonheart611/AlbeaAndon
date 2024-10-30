@@ -17,6 +17,7 @@ class LoadingDialog : DialogFragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(false)
         return dialog
     }
 }

@@ -82,7 +82,8 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_progressFragment_to_finalizeFragment"
-            app:destination="@id/finalizeFragment" />
+            app:destination="@id/finalizeFragment"
+            app:popUpTo="@id/progressFragment" />
     </fragment>
     <fragment
         android:id="@+id/finalizeFragment"

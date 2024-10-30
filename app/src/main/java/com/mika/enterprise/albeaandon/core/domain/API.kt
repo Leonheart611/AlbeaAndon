@@ -2,7 +2,7 @@ package com.mika.enterprise.albeaandon.core.domain
 
 import com.mika.enterprise.albeaandon.core.model.request.AssignTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.CloseTicketRequest
-import com.mika.enterprise.albeaandon.core.model.request.EscalateTicketRequest
+import com.mika.enterprise.albeaandon.core.model.request.EscalateTicketMechanicRequest
 import com.mika.enterprise.albeaandon.core.model.request.LoginRequest
 import com.mika.enterprise.albeaandon.core.model.request.NotifyTicketRequest
 import com.mika.enterprise.albeaandon.core.model.request.OnprogTicketRequest
@@ -80,7 +80,11 @@ interface API {
 
     @Headers("Content-Type: application/json")
     @POST("/api/tickets/escalate")
-    suspend fun postEscalateTicket(@Body param: EscalateTicketRequest): Response<TicketGeneralResponse>
+    suspend fun postEscalateTicket(@Body param: EscalateTicketMechanicRequest): Response<TicketGeneralResponse>
+
+/*    @Headers("Content-Type: application/json")
+    @POST("/api/tickets/escalate")
+    suspend fun postEscalateTicket(@Body param: EscalateTicketMechanicRequest): Response<TicketGeneralResponse>*/
 
     @Headers("Content-Type: application/json")
     @POST("/api/tickets/close")

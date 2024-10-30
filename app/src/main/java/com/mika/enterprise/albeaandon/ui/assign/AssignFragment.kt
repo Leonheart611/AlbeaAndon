@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
@@ -139,6 +140,7 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
     }
 
     private fun navigateToLogin() {
+        (requireActivity() as MainActivity).stopMqttService()
         viewModel.logout()
         findNavController().navigate(AssignFragmentDirections.actionAssignFragmentToLoginFragment())
     }

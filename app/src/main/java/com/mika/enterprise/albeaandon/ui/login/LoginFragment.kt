@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.util.EventObserver
@@ -34,6 +35,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         }
         viewModel.loginResponse.observe(viewLifecycleOwner, EventObserver {
             if (it.success) {
+                (requireActivity() as MainActivity).startMqttService()
                 findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
             }
         })

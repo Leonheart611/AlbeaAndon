@@ -47,7 +47,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         val dialog = MessageDialog(requireContext())
         dialog.setTitle("Failed Retrieve Connection Error ${errorResponse.code}")
         dialog.setMessage("${errorResponse.message}")
-        dialog.setActionButton("Retry") {
+        dialog.setActionButton("Ok") {
             onRetry()
             dialog.dismiss()
         }

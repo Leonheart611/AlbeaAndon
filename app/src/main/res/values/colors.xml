@@ -8,4 +8,7 @@
     <color name="assigned_color">#03A9F4</color>
     <color name="close_color">#4CAF50</color>
     <color name="selected_card_color">#C8E6C9</color>
+    <color name="selected_chip_background">#CCFF90</color>
+    <color name="chip_background">#FFFFFF</color>
+    <color name="chip_stroke">#84FFFF</color>
 </resources>

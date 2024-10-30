@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
 import com.mika.enterprise.albeaandon.core.util.Constant.ASSIGNED
+import com.mika.enterprise.albeaandon.core.util.Constant.ESKALASI
 import com.mika.enterprise.albeaandon.core.util.Constant.NEW
 import com.mika.enterprise.albeaandon.core.util.Constant.ONPROG
 import com.mika.enterprise.albeaandon.databinding.FragmentHomeBinding
@@ -23,6 +25,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
 
     private val viewModel: HomeViewModel by viewModels()
     private val adapter = HomeItemAdapter(this)
+    private var filterAdapter = TicketFilterAdapter {
+        viewModel.filteredStatus = it
+        adapter.filter.filter(it)
+    }
 
     override fun inflateViewBinding(
         inflater: LayoutInflater,
@@ -36,14 +42,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
         setupAdapter()
         viewModel.getUserName()
         viewModel.getTicketList()
-        viewModel.ticketResult.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        viewModel.ticketResult.observe(viewLifecycleOwner) {
+            if (viewModel.currentPage == 1) {
+                adapter.submitList(it)
+                filterAdapter.submit(viewModel.getFilterData())
+            } else adapter.updateList(it)
+        }
         viewModel.showLoading.observe(viewLifecycleOwner) {
             if (it) showLoadingDialog() else hideLoadingDialog()
         }
         viewModel.username.observe(viewLifecycleOwner) {
             binding.tbHome.title = getString(R.string.home_title_label, it)
         }
-        viewModel.isNotAuthorized.observe(viewLifecycleOwner) { if (it) showTokenExpiredDialog{ logOut() } }
+        viewModel.isNotAuthorized.observe(viewLifecycleOwner) { if (it) showTokenExpiredDialog { logOut() } }
         viewModel.showEmptyState.observe(viewLifecycleOwner) {
             binding.emptyState.root.visibility = if (it) View.VISIBLE else View.GONE
             binding.rvTicketList.visibility = if (it) View.GONE else View.VISIBLE
@@ -61,11 +72,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
     }
 
     private fun logOut() {
+        (requireActivity() as MainActivity).stopMqttService()
         viewModel.logout()
         findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToLoginFragment())
     }
 
     private fun setupAdapter() {
+        binding.refreshTicket.setOnRefreshListener {
+            viewModel.getTicketList()
+            binding.refreshTicket.isRefreshing = false
+        }
         binding.rvTicketList.adapter = adapter
         binding.rvTicketList.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTicketList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -79,11 +95,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
                 Log.d("HomeFragment", "onScrolled TotalItem:  $totalItemCount")
 
 
-                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0 && viewModel.filteredStatus.isEmpty()) {
                     viewModel.loadNextPage()
                 }
             }
         })
+        binding.rvFilterTicket.adapter = filterAdapter
+        binding.rvFilterTicket.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
     }
 
     override fun onClickListener(item: TicketData) {
@@ -98,7 +117,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
                 findNavController().navigate(action)
             }
 
-            ONPROG -> {
+            ONPROG, ESKALASI -> {
                 val action =
                     HomeFragmentDirections.actionHomeFragmentToFinalizeFragment(ticketData = item)
                 findNavController().navigate(action)

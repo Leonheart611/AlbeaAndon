@@ -1,6 +1,5 @@
 package com.mika.enterprise.albeaandon.ui.util
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
@@ -11,7 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.mika.enterprise.albeaandon.MainViewModel
@@ -38,18 +37,12 @@ class NfcVerifyDialog : DialogFragment() {
         return binding.root
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = NfcVerifyDialogBinding.inflate(layoutInflater)
-        val builder = AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-        return builder.create()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         nfcManager = context?.getSystemService(Context.NFC_SERVICE) as NfcManager
         nfcAdapter = nfcManager?.defaultAdapter
         binding.ivNfcClose.setOnClickListener {
+            Log.d("NFC_ID", "Close")
             dismiss()
         }
         if (nfcAdapter?.isEnabled?.not() == true) {
@@ -79,6 +72,12 @@ class NfcVerifyDialog : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
+
+        val params: ViewGroup.LayoutParams = dialog!!.window!!.attributes
+        params.width = WindowManager.LayoutParams.MATCH_PARENT
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog!!.window!!.attributes = params as WindowManager.LayoutParams
+
         nfcAdapter?.enableReaderMode(
             requireActivity(),
             readerCallback,

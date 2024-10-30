@@ -1,7 +1,9 @@
 package com.mika.enterprise.albeaandon.core.util
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.widget.Toast
+import com.google.android.gms.common.util.ClientLibraryUtils.getPackageInfo
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.mika.enterprise.albeaandon.R
@@ -60,3 +62,10 @@ fun mappingAssignFilter(userDept: String): String {
         else -> ""
     }
 }
+
+fun Context.getVersionName(): String = try {
+    getPackageInfo(this, this.packageName)?.versionName ?:""
+} catch (e: PackageManager.NameNotFoundException) {
+    ""
+}
+

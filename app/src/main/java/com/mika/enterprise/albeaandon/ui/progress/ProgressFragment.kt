@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
@@ -132,7 +133,9 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
         }
         viewModel.isUnAuthorized.observe(viewLifecycleOwner) {
             if (it) {
-                showTokenExpiredDialog { findNavController().navigate(ProgressFragmentDirections.actionProgressFragmentToLoginFragment()) }
+                showTokenExpiredDialog {
+                    (requireActivity() as MainActivity).stopMqttService()
+                    findNavController().navigate(ProgressFragmentDirections.actionProgressFragmentToLoginFragment()) }
             }
         }
         activityViewModel.problemGroupValue.observe(viewLifecycleOwner, EventObserver {

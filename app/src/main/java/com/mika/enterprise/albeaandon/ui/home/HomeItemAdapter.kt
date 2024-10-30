@@ -2,6 +2,8 @@ package com.mika.enterprise.albeaandon.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,7 +16,21 @@ import com.mika.enterprise.albeaandon.core.util.orEmptyDash
 import com.mika.enterprise.albeaandon.databinding.HomeViewItemBinding
 
 class HomeItemAdapter(val listener: OnHomeItemClicked? = null) :
-    ListAdapter<TicketData, HomeItemAdapter.HomeItemViewHolder>(TicketDiffUtils()) {
+    ListAdapter<TicketData, HomeItemAdapter.HomeItemViewHolder>(TicketDiffUtils()), Filterable {
+    val originalData = mutableListOf<TicketData>()
+
+    fun submitList(list: List<TicketData>, filter: Boolean = false) {
+        if (filter.not()) {
+            originalData.clear()
+            originalData.addAll(list)
+        }
+        super.submitList(list)
+    }
+
+    fun updateList(list: List<TicketData>) {
+        originalData.addAll(list)
+        super.submitList(list)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeItemViewHolder {
         return HomeItemViewHolder(
@@ -67,6 +83,29 @@ class HomeItemAdapter(val listener: OnHomeItemClicked? = null) :
                 )
                 root.setOnClickListener { listener?.onClickListener(item) }
             }
+        }
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val filteredList = if (constraint.isNullOrEmpty() || constraint == "ALL") {
+                    originalData
+                } else {
+                    originalData.filter { item ->
+                        item.ticketStatus.contains(constraint, ignoreCase = true)
+                    }
+                }
+                val results = FilterResults()
+                results.values = filteredList
+                results.count = filteredList.size
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                submitList(results?.values as MutableList<TicketData>, true)
+            }
+
         }
     }
 

@@ -24,17 +24,15 @@ class EscalationDialog(context: Context) : BottomSheetDialog(context) {
         binding.etEscalationMessage.doAfterTextChanged {
             binding.tilEscalationMessage.error = null
         }
-        val message = binding.etEscalationMessage.text.toString()
         binding.btnEscalate.setOnClickListener {
+            val message = binding.etEscalationMessage.text.toString()
             if (message.isBlank()) {
                 binding.tilEscalationMessage.error =
                     context.getString(R.string.escalation_error_no_message)
             } else {
-                listener.invoke(message)
+                listener(message)
                 dismiss()
             }
         }
     }
-
-
 }

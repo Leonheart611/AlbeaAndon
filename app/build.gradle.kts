@@ -18,9 +18,9 @@ android {
         minSdk = 34
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
-
+        versionName = "0.1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -30,9 +30,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-        debug {
-            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -53,7 +50,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.org.eclipse.paho.client.mqttv3)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.viewbinding)
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -64,6 +60,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -71,6 +68,10 @@ dependencies {
     implementation(libs.gson.converter)
     implementation(libs.retrofit)
     implementation(libs.androidx.pagging3)
+    implementation(libs.mqtt.android.service)
+    implementation("androidx.multidex:multidex:2.0.1")
+    implementation("com.android.support:support-v4:28.0.0")
+    implementation ("com.github.hannesa2:paho.mqtt.android:4.3.beta5")
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

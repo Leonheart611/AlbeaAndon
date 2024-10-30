@@ -9,7 +9,6 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.9.1"
 constraintlayout = "2.1.4"
-orgEclipsePahoClientMqttv3 = "1.2.5"
 hiltVersion = "2.52"
 ksp = "2.0.0-1.0.23"
 roomCompiler = "2.6.1"
@@ -23,6 +22,7 @@ legacySupportV4 = "1.0.0"
 lifecycleLivedataKtx = "2.8.4"
 lifecycleViewmodelKtx = "2.8.4"
 fragmentKtx = "1.8.2"
+workRuntimeKtx = "2.9.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,7 +36,6 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-org-eclipse-paho-client-mqttv3 = { group = "org.eclipse.paho", name = "org.eclipse.paho.client.mqttv3", version.ref = "orgEclipsePahoClientMqttv3" }
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion" }
 androidx-viewbinding = { group = "androidx.databinding", name = "viewbinding", version.ref = "viewbinding" }
@@ -53,6 +52,8 @@ retrofit = "com.squareup.retrofit2:retrofit:2.9.0"
 chucker-interceptor = "com.github.chuckerteam.chucker:library:4.0.0"
 chucker-release-no-op = "com.github.chuckerteam.chucker:library-no-op:4.0.0"
 androidx-pagging3 = "androidx.paging:paging-runtime-ktx:3.3.2"
+mqtt-android-service = "org.eclipse.paho:org.eclipse.paho.android.service:1.1.1"
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

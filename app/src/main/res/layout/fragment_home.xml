@@ -5,7 +5,7 @@
     android:id="@+id/frameLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment" >
+    tools:context=".ui.home.HomeFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tb_home"
@@ -22,13 +22,33 @@
         app:titleTextColor="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_ticket_list"
+        android:id="@+id/rv_filter_ticket"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_home"
+        tools:itemCount="1"
+        tools:listitem="@layout/filter_chip_item" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_ticket"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tb_home" />
+        app:layout_constraintTop_toBottomOf="@+id/rv_filter_ticket">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_ticket_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="8dp" />
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     <include
         android:id="@+id/empty_state"

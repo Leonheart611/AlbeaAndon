@@ -21,6 +21,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -51,6 +52,9 @@ class Module {
     ): OkHttpClient {
         return OkHttpClient.Builder().addInterceptor(authInterceptor)
             .addInterceptor(ChuckerInterceptor(context))
+            .callTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(2, TimeUnit.MINUTES)
+            .writeTimeout(2, TimeUnit.MINUTES)
             .build()
     }
 

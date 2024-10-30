@@ -67,4 +67,11 @@
     <string name="finalize_escalation_ticket_success">Success Escalation Ticket</string>
     <string name="finalize_success_button_label">Okay</string>
     <string name="finalize_title_label">Update Progress Ticket</string>
+    <string name="spv_done_todo_select_title">Select Actual Problem Details</string>
+    <string name="spv_done_todo_confirmation_title">Confirmation Actual Problem</string>
+    <string name="spv_done_todo_confirmation_message">Please confirm actual problem is same with current expected problem..??</string>
+    <string name="spv_done_negative_button_label">No</string>
+    <string name="spv_done_positive_button_label">Yes</string>
+    <string name="spv_done_submit_button_label">Submit</string>
+    <string name="spv_done_required_message">Please select this field first</string>
 </resources>

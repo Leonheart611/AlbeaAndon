@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
+import com.mika.enterprise.albeaandon.core.repository.UserRepository
+import com.mika.enterprise.albeaandon.core.util.Constant
 import com.mika.enterprise.albeaandon.core.util.ErrorResponse
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FinalizeViewModel @Inject constructor(
-    private val repository: NetworkRepository
+    private val repository: NetworkRepository,
+    private val userRepo: UserRepository
 ) : ViewModel() {
 
     private val _ticketDetail = MutableLiveData<TicketData>()
@@ -32,6 +35,15 @@ class FinalizeViewModel @Inject constructor(
     val showLoading = MutableLiveData<Boolean>()
     val isUnauthorized = MutableLiveData<Boolean>()
     var ticketId = 0
+    var userDept = ""
+
+    fun setupUserDept() {
+        viewModelScope.launch {
+            userDept = userRepo.login()?.userDept.orEmpty()
+        }
+    }
+
+    fun userDeptSPV() = userDept == Constant.SPV_PRODUCTION
 
     fun getTicketId(id: Int) {
         viewModelScope.launch {
@@ -55,7 +67,28 @@ class FinalizeViewModel @Inject constructor(
                 showLoading.postValue(false)
                 when (it) {
                     is ResultResponse.EmptyOrNotFound -> {}
-                    is ResultResponse.Error -> { _errorTicket.postValue(it.errorResponse) }
+                    is ResultResponse.Error -> {
+                        _errorTicket.postValue(it.errorResponse)
+                    }
+
+                    is ResultResponse.Success -> _doneTicketStatus.postValue(true)
+                    is ResultResponse.UnAuthorized -> logout()
+                }
+            }
+        }
+    }
+
+    fun closeTicket(problemId: Int) {
+        viewModelScope.launch {
+            showLoading.postValue(true)
+            repository.postCloseTicket(ticketId = ticketId, problemId = problemId).collect {
+                showLoading.postValue(false)
+                when (it) {
+                    is ResultResponse.EmptyOrNotFound -> {}
+                    is ResultResponse.Error -> {
+                        _errorTicket.postValue(it.errorResponse)
+                    }
+
                     is ResultResponse.Success -> _doneTicketStatus.postValue(true)
                     is ResultResponse.UnAuthorized -> logout()
                 }
