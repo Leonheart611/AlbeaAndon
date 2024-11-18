@@ -81,4 +81,14 @@
         app:navigationIcon="@drawable/baseline_arrow_back_24"
         app:title="@string/finalize_title_label"
         app:titleTextColor="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_escalation_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_finalize_action_plan" />
 </androidx.constraintlayout.widget.ConstraintLayout>

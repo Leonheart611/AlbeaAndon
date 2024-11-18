@@ -88,7 +88,6 @@ class FinalizeViewModel @Inject constructor(
                     is ResultResponse.Error -> {
                         _errorTicket.postValue(it.errorResponse)
                     }
-
                     is ResultResponse.Success -> _doneTicketStatus.postValue(true)
                     is ResultResponse.UnAuthorized -> logout()
                 }

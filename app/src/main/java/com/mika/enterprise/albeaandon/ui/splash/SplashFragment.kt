@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.core.BaseFragment
+import com.mika.enterprise.albeaandon.core.util.Constant.FRAGMENT_KEY_SKIP_SPLASH
 import com.mika.enterprise.albeaandon.core.util.Constant.REQUEST_CODE
 import com.mika.enterprise.albeaandon.core.util.getVersionName
 import com.mika.enterprise.albeaandon.core.worker.MqttService
@@ -33,6 +34,11 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentSplashBinding {
+        val fragmentSkipSplash =
+            activity?.intent?.getBooleanExtra(FRAGMENT_KEY_SKIP_SPLASH, false) ?: false
+        if (fragmentSkipSplash) {
+            findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToHomeFragment())
+        }
         return FragmentSplashBinding.inflate(inflater, container, false)
     }
 

@@ -16,6 +16,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.R
+import com.mika.enterprise.albeaandon.core.util.Constant.FRAGMENT_KEY_SKIP_SPLASH
 import com.mika.enterprise.albeaandon.core.util.Constant.NOTIFICATION_CHANEL_ID
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_NIK
 import info.mqtt.android.service.MqttAndroidClient
@@ -38,23 +39,22 @@ class MqttWorker(val context: Context, workerParams: WorkerParameters) :
     val testClientId = "clientId-7v5PSjEMDr"
 
     val intent = Intent(context, MainActivity::class.java).apply {
+        putExtra(FRAGMENT_KEY_SKIP_SPLASH, true)
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     }
     val pendingIntent: PendingIntent =
         PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-    private val mqttClient = MqttAndroidClient(context, testingURI, testClientId)
+    private var mqttClient = MqttAndroidClient(context, testingURI, testClientId)
 
     override fun doWork(): Result {
-        if (isStopped) {
-            mqttClient.disconnect()
-            return Result.success()
-        } else {
+        while (!isStopped) {
             createNotificationChannel()
             val mqttConnectOptions = MqttConnectOptions()
             mqttConnectOptions.isAutomaticReconnect = true
             mqttConnectOptions.isCleanSession = false
             mqttConnectOptions.keepAliveInterval = 60
+            if (mqttClient.isConnected) subscribeTopic(false)
             mqttClient.connect(mqttConnectOptions, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
                     val disconnectedBufferOptions = DisconnectedBufferOptions()
@@ -88,7 +88,7 @@ class MqttWorker(val context: Context, workerParams: WorkerParameters) :
                 }
 
                 override fun connectComplete(reconnect: Boolean, serverURI: String?) {
-                    Log.d("MQTT Connect", "$reconnect $serverURI")
+                    Log.d("MQTT Connect", "is Reconnect $reconnect $serverURI")
                     if (reconnect) subscribeTopic(false)
                 }
 
@@ -96,10 +96,12 @@ class MqttWorker(val context: Context, workerParams: WorkerParameters) :
             })
             return Result.success()
         }
+        return Result.failure()
     }
 
+
     fun subscribeTopic(showNotification: Boolean = true) {
-        val nik = inputData.getString(USER_NIK)
+        val nik = inputData.getString(USER_NIK).orEmpty()
         mqttClient.subscribe(
             "handheld/alert/$nik",
             0,

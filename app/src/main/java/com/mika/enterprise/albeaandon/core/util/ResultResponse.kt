@@ -34,16 +34,20 @@ fun <T> handleUnauthorizedError(response: Response<T>): ResultResponse<T> {
 }
 
 fun <T> handleGenericError(response: Response<T>): ResultResponse<T> {
+    val message = response.errorBody()?.string()?.toErrorResponseValue()?.messages?.firstOrNull()
     FirebaseCrashlytics.getInstance()
         .recordException(
             Exception(
-                "Error Login -- ${response.code()} -- ${
+                "Error -- ${response.code()} -- ${
                     response.errorBody()?.string()
                 }"
             )
         )
     return ResultResponse.Error(
-        ErrorResponse(code = response.code(), message = response.message())
+        ErrorResponse(
+            code = response.code(),
+            message =  message
+        )
     )
 }
 

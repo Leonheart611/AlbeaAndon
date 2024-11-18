@@ -6,6 +6,7 @@ import android.widget.Toast
 import com.google.android.gms.common.util.ClientLibraryUtils.getPackageInfo
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.util.Constant.SPV_PRODUCTION
 import com.mika.enterprise.albeaandon.core.util.Constant.spvUserDeptFilter
@@ -21,6 +22,21 @@ fun ResponseBody?.toErrorResponseValue(): ErrorResponseValue {
         val errorResponse = Gson().fromJson(this?.string(), ErrorResponseValue::class.java)
         return errorResponse
     } catch (e: Exception) {
+        e.printStackTrace()
+        return ErrorResponseValue(
+            success = false,
+            messages = listOf("Something went wrong")
+        )
+    }
+}
+
+fun String.toErrorResponseValue(): ErrorResponseValue {
+    try {
+        val gson = GsonBuilder().setLenient().create()
+        val errorResponse = gson.fromJson(this, ErrorResponseValue::class.java)
+        return errorResponse
+    } catch (e: Exception) {
+        e.printStackTrace()
         return ErrorResponseValue(
             success = false,
             messages = listOf("Something went wrong")
@@ -55,7 +71,7 @@ fun mappingColors(status: String): Int {
 }
 
 fun mappingAssignFilter(userDept: String): String {
-    return when(userDept){
+    return when (userDept) {
         SPV_PRODUCTION -> spvUserDeptFilter
         "Mechanic" -> "MECHANIC"
         "OperatorBahan" -> "OPERATOR_BAHAN"
@@ -64,7 +80,7 @@ fun mappingAssignFilter(userDept: String): String {
 }
 
 fun Context.getVersionName(): String = try {
-    getPackageInfo(this, this.packageName)?.versionName ?:""
+    getPackageInfo(this, this.packageName)?.versionName ?: ""
 } catch (e: PackageManager.NameNotFoundException) {
     ""
 }

@@ -108,9 +108,13 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
                 buttonText = getString(R.string.problem_error_no_todo_id_selected_action)
             ) {}
             else {
-                val dialogFragment = NfcVerifyDialog()
-                dialogFragment.setCancelable(false)
-                dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
+                viewModel.postOnProgressTicket(
+                    args.ticketData.ticketID,
+                    activityViewModel.todoValue.value?.peekContent()?.id ?: 0
+                )
+                /* val dialogFragment = NfcVerifyDialog()
+                 dialogFragment.setCancelable(false)
+                 dialogFragment.show(childFragmentManager, "nfc_verify_dialog")*/
             }
         }
     }
@@ -123,9 +127,7 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
                 message = "",
                 buttonText = getString(R.string.onprogress_success_button_label)
             ) {
-                val action =
-                    ProgressFragmentDirections.actionProgressFragmentToFinalizeFragment(args.ticketData.ticketID)
-                findNavController().navigate(action)
+                findNavController().popBackStack()
             }
         }
         viewModel.showLoading.observe(viewLifecycleOwner) {
@@ -135,7 +137,8 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
             if (it) {
                 showTokenExpiredDialog {
                     (requireActivity() as MainActivity).stopMqttService()
-                    findNavController().navigate(ProgressFragmentDirections.actionProgressFragmentToLoginFragment()) }
+                    findNavController().navigate(ProgressFragmentDirections.actionProgressFragmentToLoginFragment())
+                }
             }
         }
         activityViewModel.problemGroupValue.observe(viewLifecycleOwner, EventObserver {
@@ -147,20 +150,24 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
         activityViewModel.todoValue.observe(viewLifecycleOwner, EventObserver {
             binding.etTodoPlan.setText(it.name)
         })
-        activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
-            if (it == args.ticketData.rfid || IS_INTERNAL_TEST) {
-                viewModel.postOnProgressTicket(
-                    args.ticketData.ticketID,
-                    activityViewModel.todoValue.value?.peekContent()?.id ?: 0
-                )
-            } else {
-                showMessageDialog(
-                    title = getString(R.string.nfc_verify_fail_title),
-                    message = getString(R.string.nfc_verify_fail_desc, it),
-                    buttonText = getString(R.string.nfc_verify_fail_button_label)
-                ) {}
-            }
-        })
+        viewModel.errorResponse.observe(viewLifecycleOwner) {
+            showMessageDialog(
+                title = getString(R.string.general_server_error_title),
+                message = getString(R.string.general_server_error_desc, it.code, it.message),
+                buttonText = getString(R.string.general_server_error_action_button)
+            ) {}
+        }
+        /*     activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
+                 if (it == args.ticketData.rfid || IS_INTERNAL_TEST) {
+
+                 } else {
+                     showMessageDialog(
+                         title = getString(R.string.nfc_verify_fail_title),
+                         message = getString(R.string.nfc_verify_fail_desc, it),
+                         buttonText = getString(R.string.nfc_verify_fail_button_label)
+                     ) {}
+                 }
+             })*/
     }
 
     private fun showPreviousDataEmpty() {

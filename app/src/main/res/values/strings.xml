@@ -20,6 +20,7 @@
     <string name="ticket_date_label">Create Date: %1$s</string>"
     <string name="ticket_machine_loc_label">Machine Loc: %1$s</string>"
     <string name="ticket_action_plan_label">Action Plan: %1$s</string>
+    <string name="ticket_escalation_message_label">Escalation Message: %1$s</string>
     <string name="home_title_label">Hi, %1$s</string>
     <string name="assign_title_label">Assign Ticket</string>
     <string name="assign_button_label">Assign Personnel</string>
@@ -35,7 +36,7 @@
     <string name="nfc_verify_button_label">Close</string>
     <string name="nfc_verify_enable_nfc_message">NFC is not enabled on this device. Please enable NFC to continue.</string>
     <string name="nfc_verify_fail_title">Failed to Verify</string>
-    <string name="nfc_verify_fail_desc">Failed to verify your location and position nfc value is %1$s</string>
+    <string name="nfc_verify_fail_desc">Failed to verify your location and position because NFC rfid not matched with this ticket</string>
     <string name="nfc_verify_fail_button_label">Close</string>
     <string name="assign_success_title">Success Assign Ticket</string>
     <string name="assign_success_desc">Success assign ticket to %1$s</string>
@@ -64,6 +65,7 @@
     <string name="escalation_error_no_message">Please Enter Escalation Message</string>
     <string name="finalize_notify_done_ticket_success">Success Notify Done Ticket</string>
     <string name="finalize_notify_help_ticket_success">Success Request Help Ticket</string>
+    <string name="finalize_close_ticket_success">Success Close Ticket</string>
     <string name="finalize_escalation_ticket_success">Success Escalation Ticket</string>
     <string name="finalize_success_button_label">Okay</string>
     <string name="finalize_title_label">Update Progress Ticket</string>
@@ -74,4 +76,7 @@
     <string name="spv_done_positive_button_label">Yes</string>
     <string name="spv_done_submit_button_label">Submit</string>
     <string name="spv_done_required_message">Please select this field first</string>
+    <string name="general_server_error_title">Something Went Wrong</string>
+    <string name="general_server_error_desc">Error Code: %1$d \nError Message: %2$s</string>
+    <string name="general_server_error_action_button">Okay</string>
 </resources>

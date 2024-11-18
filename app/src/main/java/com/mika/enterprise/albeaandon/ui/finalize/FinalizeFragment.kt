@@ -24,7 +24,6 @@ import com.mika.enterprise.albeaandon.core.util.mappingColors
 import com.mika.enterprise.albeaandon.databinding.FragmentFinalizeBinding
 import com.mika.enterprise.albeaandon.ui.util.EscalationDialog
 import com.mika.enterprise.albeaandon.ui.util.MessageDialog
-import com.mika.enterprise.albeaandon.ui.util.NfcVerifyDialog
 import com.mika.enterprise.albeaandon.ui.util.SPVCloseDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -58,11 +57,21 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
             ) {}
         }
         viewModel.doneTicketStatus.observe(viewLifecycleOwner) {
-            if (it) showMessageDialog(
-                title = getString(R.string.finalize_notify_done_ticket_success),
-                message = "",
-                buttonText = getString(R.string.finalize_success_button_label)
-            ) {}
+            if (it){
+                if (viewModel.userDeptSPV()){
+                    showMessageDialog(
+                        title = getString(R.string.finalize_close_ticket_success),
+                        message = "",
+                        buttonText = getString(R.string.finalize_success_button_label)
+                    ) { findNavController().popBackStack() }
+                }
+                else
+                showMessageDialog(
+                    title = getString(R.string.finalize_notify_done_ticket_success),
+                    message = "",
+                    buttonText = getString(R.string.finalize_success_button_label)
+                ) { findNavController().popBackStack() }
+            }
         }
         viewModel.escalateTicketStatus.observe(viewLifecycleOwner) {
             if (it) showMessageDialog(
@@ -78,6 +87,13 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
                 viewModel.logout()
                 findNavController().navigate(FinalizeFragmentDirections.actionFinalizeFragmentToLoginFragment())
             }
+        }
+        viewModel.errorTicket.observe(viewLifecycleOwner) {
+            showMessageDialog(
+                title = getString(R.string.general_server_error_title),
+                message = getString(R.string.general_server_error_desc, it.code, it.message),
+                buttonText = getString(R.string.general_server_error_action_button)
+            ) {}
         }
         activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
             if (it == args.ticketData?.rfid.orEmpty() || IS_INTERNAL_TEST) {
@@ -107,8 +123,7 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
         btnEskalation.setOnClickListener {
             val dialog = EscalationDialog(requireContext())
             dialog.setEscalationListener {
-                if (viewModel.userDeptSPV()) setupSpvTodoConfirmDialog()
-                else viewModel.escalateTicket(ticketId = viewModel.ticketId, message = it)
+                viewModel.escalateTicket(ticketId = viewModel.ticketId, message = it)
             }
             dialog.show()
         }
@@ -149,6 +164,10 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
         binding.tvFinalizeProblem.text = getString(R.string.ticket_problem_label, value.problem)
         binding.tvFinalizeActionPlan.text =
             getString(R.string.ticket_action_plan_label, value.actionPlan)
+        binding.tvEscalationMessage.text = getString(
+            R.string.ticket_escalation_message_label,
+            value.message
+        )
         binding.btnHelp.isVisible = viewModel.userDeptSPV().not()
         binding.btnEskalation.isVisible = viewModel.userDeptSPV().not()
     }
@@ -162,19 +181,26 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
                 dialog.dismiss()
                 setupSpvTodoDialog()
             },
-            onYesClickListener = { showNfcVerifyDialog() }
+            onYesClickListener = {
+                dialog.dismiss()
+                viewModel.closeTicket(activityViewModel.todoValue.value?.peekContent()?.id ?: 1)
+            }
         )
         dialog.show()
     }
 
-    private fun showNfcVerifyDialog() {
-        val dialogFragment = NfcVerifyDialog()
-        dialogFragment.setCancelable(false)
-        dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
-    }
+    /*    private fun showNfcVerifyDialog() {
+            val dialogFragment = NfcVerifyDialog()
+            dialogFragment.setCancelable(false)
+            dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
+        }*/
 
     private fun setupSpvTodoDialog() {
-        val dialog = SPVCloseDialog { showNfcVerifyDialog() }
+        val dialog = SPVCloseDialog {
+            viewModel.closeTicket(
+                activityViewModel.todoValue.value?.peekContent()?.id ?: 0
+            )
+        }
         dialog.show(childFragmentManager, "spv_close_dialog")
     }
 }

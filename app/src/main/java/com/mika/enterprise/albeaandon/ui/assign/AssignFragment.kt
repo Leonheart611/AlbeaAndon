@@ -7,29 +7,23 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mika.enterprise.albeaandon.MainActivity
-import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelData
-import com.mika.enterprise.albeaandon.core.util.Constant.IS_INTERNAL_TEST
 import com.mika.enterprise.albeaandon.core.util.Constant.userGroups
-import com.mika.enterprise.albeaandon.core.util.EventObserver
 import com.mika.enterprise.albeaandon.core.util.convertDateIntoLocalDateTime
 import com.mika.enterprise.albeaandon.databinding.FragmentAssignBinding
-import com.mika.enterprise.albeaandon.ui.util.NfcVerifyDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.OnPersonnelClicked {
 
     private val viewModel: AssignViewModel by viewModels()
-    private val nfcViewModel: MainViewModel by activityViewModels()
     private val adapter = PersonnelAdapter(mutableListOf(), this)
     private val args: AssignFragmentArgs by navArgs()
 
@@ -73,20 +67,24 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
                 ) { findNavController().popBackStack() }
             }
         }
-        nfcViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
-            if (it == args.ticketData.rfid || IS_INTERNAL_TEST) {
-                viewModel.postAssignTicket(
-                    username = viewModel.selectedPersonnel?.userName.orEmpty(),
-                    ticketId = args.ticketData.ticketID
-                )
-            } else {
-                showMessageDialog(
-                    title = getString(R.string.nfc_verify_fail_title),
-                    message = getString(R.string.nfc_verify_fail_desc, it),
-                    buttonText = getString(R.string.nfc_verify_fail_button_label)
-                ) {}
-            }
-        })
+        viewModel.errorResponse.observe(viewLifecycleOwner) {
+            showMessageDialog(
+                title = getString(R.string.general_server_error_title),
+                message = getString(R.string.general_server_error_desc, it.code, it.message),
+                buttonText = getString(R.string.general_server_error_action_button)
+            ) {}
+        }
+        /*        nfcViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
+                    if (it == args.ticketData.rfid || IS_INTERNAL_TEST) {
+
+                    } else {
+                        showMessageDialog(
+                            title = getString(R.string.nfc_verify_fail_title),
+                            message = getString(R.string.nfc_verify_fail_desc, it),
+                            buttonText = getString(R.string.nfc_verify_fail_button_label)
+                        ) {}
+                    }
+                })*/
     }
 
     private fun setupHeader() = with(binding) {
@@ -107,9 +105,10 @@ class AssignFragment : BaseFragment<FragmentAssignBinding>(), PersonnelAdapter.O
         }
         binding.btnAssign.setOnClickListener {
             if (viewModel.selectedPersonnel != null) {
-                val dialogFragment = NfcVerifyDialog()
-                dialogFragment.setCancelable(false)
-                dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
+                viewModel.postAssignTicket(
+                    username = viewModel.selectedPersonnel?.userName.orEmpty(),
+                    ticketId = args.ticketData.ticketID
+                )
             } else {
                 showMessageDialog(
                     title = getString(R.string.assign_personnel_not_selected_label),

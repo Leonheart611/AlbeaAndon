@@ -29,6 +29,7 @@ interface API {
     @GET("/api/tickets")
     suspend fun getTickets(
         @Query("status") status: String,
+        @Query("assign_to") assignTo:String? = null,
         @Query("page") page: Int,
         @Query("limit") limit: Int
     ): Response<TicketResponse>

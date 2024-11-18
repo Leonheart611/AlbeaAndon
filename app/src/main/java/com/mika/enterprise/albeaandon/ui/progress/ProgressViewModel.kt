@@ -8,6 +8,7 @@ import com.mika.enterprise.albeaandon.core.model.response.ProblemGroupResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketGeneralResponse
 import com.mika.enterprise.albeaandon.core.model.response.toGeneralProblem
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
+import com.mika.enterprise.albeaandon.core.util.ErrorResponse
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,6 +25,8 @@ class ProgressViewModel @Inject constructor(
     val problemGroupResponse: LiveData<ProblemGroupResponse> = _problemGroupResponse
     private val _onProgressResponse = MutableLiveData<TicketGeneralResponse>()
     val onProgressResponse: LiveData<TicketGeneralResponse> = _onProgressResponse
+    private val _errorResponse = MutableLiveData<ErrorResponse>()
+    val errorResponse: LiveData<ErrorResponse> = _errorResponse
 
     val isUnAuthorized = MutableLiveData<Boolean>()
 
@@ -34,7 +37,7 @@ class ProgressViewModel @Inject constructor(
                 showLoading.postValue(false)
                 when (it) {
                     is ResultResponse.Success -> _problemGroupResponse.postValue(it.data)
-                    is ResultResponse.Error -> {}
+                    is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
                     is ResultResponse.UnAuthorized -> logOut()
                     is ResultResponse.EmptyOrNotFound -> {}
                 }
@@ -49,7 +52,7 @@ class ProgressViewModel @Inject constructor(
                 showLoading.postValue(false)
                 when (it) {
                     is ResultResponse.Success -> _problemGroupResponse.postValue(it.data)
-                    is ResultResponse.Error -> {}
+                    is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
                     is ResultResponse.UnAuthorized -> logOut()
                     is ResultResponse.EmptyOrNotFound -> {}
                 }
@@ -73,7 +76,7 @@ class ProgressViewModel @Inject constructor(
                         )
                     }
 
-                    is ResultResponse.Error -> {}
+                    is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
                     is ResultResponse.UnAuthorized -> logOut()
                     is ResultResponse.EmptyOrNotFound -> {}
                 }
@@ -88,7 +91,7 @@ class ProgressViewModel @Inject constructor(
                 showLoading.postValue(false)
                 when (it) {
                     is ResultResponse.Success -> _onProgressResponse.postValue(it.data)
-                    is ResultResponse.Error -> {}
+                    is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
                     is ResultResponse.UnAuthorized -> logOut()
                     is ResultResponse.EmptyOrNotFound -> {}
                 }

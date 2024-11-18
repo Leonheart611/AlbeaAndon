@@ -9,11 +9,13 @@ object Constant {
     const val ONPROG = "ONPROG"
     const val ESKALASI = "ESKALASI"
     const val ASSIGNED = "ASSIGNED"
+    const val ALL = "ALL"
     const val SPV_PRODUCTION = "SPV Production"
     const val MECHANIC = "Mechanic"
     const val OPERATOR_BAHAN = "OperatorBahan"
     const val NOTIFICATION_CHANEL_ID = "NOTIFICATION_CHANEL_ID"
     const val UNIQUE_WORK_NAME = "UNIQUE_WORK_NAME"
+    const val FRAGMENT_KEY_SKIP_SPLASH = "FRAGMENT_KEY_SKIP_SPLASH"
 
     val userGroups = listOf("A", "B", "C", "D")
     val spvUserDeptFilter = listOf("Mechanic", "OperatorBahan").joinToString(",")

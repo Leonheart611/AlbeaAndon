@@ -70,12 +70,12 @@ class MainActivity : AppCompatActivity() {
             .build()
         WorkManager.getInstance(this).enqueueUniqueWork(
             UNIQUE_WORK_NAME,
-            ExistingWorkPolicy.REPLACE, // Replace existing work
+            ExistingWorkPolicy.REPLACE,
             workRequest
         )
     }
 
-    fun stopBackgroundService() {
+    private fun stopBackgroundService() {
         WorkManager.getInstance(this).cancelUniqueWork(UNIQUE_WORK_NAME)
     }
 

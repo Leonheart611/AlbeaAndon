@@ -28,7 +28,12 @@ import javax.inject.Inject
 
 interface NetworkRepository {
     suspend fun login(username: String, password: String): Flow<ResultResponse<LoginResponse>>
-    suspend fun getTickets(status: String, page: Int): Flow<ResultResponse<TicketResponse>>
+    suspend fun getTickets(
+        status: String,
+        page: Int,
+        assignTo: String? = null
+    ): Flow<ResultResponse<TicketResponse>>
+
     suspend fun getTicketDetail(ticketId: Int): Flow<ResultResponse<TicketResponse>>
     suspend fun getPersonnelsAvailability(
         userGroup: String,
@@ -105,15 +110,16 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun getTickets(
         status: String,
-        page: Int
+        page: Int,
+        assignTo: String?
     ): Flow<ResultResponse<TicketResponse>> =
         flow {
             try {
-                val response = api.getTickets(status = status, page = page, limit = 20)
+                val response =
+                    api.getTickets(status = status, page = page, limit = 20, assignTo = assignTo)
                 when (response.code()) {
-                    200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
-                    401 -> emit(handleUnauthorizedError(response))
-                    404 -> emit(handleNotFoundError(response))
+                    in listOf(200, 202) -> response.body()?.let { emit(ResultResponse.Success(it)) }
+                    401, 403 -> emit(handleUnauthorizedError(response))
                     else -> emit(handleGenericError(response))
                 }
             } catch (e: Exception) {
@@ -262,7 +268,6 @@ class NetworkRepositoryImpl @Inject constructor(
                 when (response.code()) {
                     200 -> response.body()?.let { emit(ResultResponse.Success(it)) }
                     401 -> emit(handleUnauthorizedError(response))
-                    404 -> emit(handleNotFoundError(response))
                     else -> emit(handleGenericError(response))
                 }
             } catch (e: Exception) {

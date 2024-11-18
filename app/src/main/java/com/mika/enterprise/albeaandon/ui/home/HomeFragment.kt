@@ -5,28 +5,35 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mika.enterprise.albeaandon.MainActivity
+import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.model.response.TicketData
+import com.mika.enterprise.albeaandon.core.util.Constant.ALL
 import com.mika.enterprise.albeaandon.core.util.Constant.ASSIGNED
 import com.mika.enterprise.albeaandon.core.util.Constant.ESKALASI
+import com.mika.enterprise.albeaandon.core.util.Constant.IS_INTERNAL_TEST
 import com.mika.enterprise.albeaandon.core.util.Constant.NEW
 import com.mika.enterprise.albeaandon.core.util.Constant.ONPROG
+import com.mika.enterprise.albeaandon.core.util.EventObserver
 import com.mika.enterprise.albeaandon.databinding.FragmentHomeBinding
+import com.mika.enterprise.albeaandon.ui.util.NfcVerifyDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHomeItemClicked {
 
     private val viewModel: HomeViewModel by viewModels()
+    private val activityViewModel: MainViewModel by activityViewModels()
     private val adapter = HomeItemAdapter(this)
     private var filterAdapter = TicketFilterAdapter {
-        viewModel.filteredStatus = it
+        viewModel.filteredStatus = if (it == ALL) "" else it
         adapter.filter.filter(it)
     }
 
@@ -58,6 +65,48 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
         viewModel.showEmptyState.observe(viewLifecycleOwner) {
             binding.emptyState.root.visibility = if (it) View.VISIBLE else View.GONE
             binding.rvTicketList.visibility = if (it) View.GONE else View.VISIBLE
+        }
+        activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
+            with(viewModel.itemClicked) {
+                if (it == rfid || IS_INTERNAL_TEST) {
+                    when (ticketStatus) {
+                        NEW -> {
+                            val action =
+                                HomeFragmentDirections.actionHomeFragmentToAssignFragment(this)
+                            findNavController().navigate(action)
+                        }
+
+                        ASSIGNED -> {
+                            val action =
+                                HomeFragmentDirections.actionHomeFragmentToProgressFragment(this)
+                            findNavController().navigate(action)
+                        }
+
+                        ONPROG, ESKALASI -> {
+                            val action =
+                                HomeFragmentDirections.actionHomeFragmentToFinalizeFragment(
+                                    ticketData = this
+                                )
+                            findNavController().navigate(action)
+                        }
+
+                        else -> {}
+                    }
+                } else {
+                    showMessageDialog(
+                        title = getString(R.string.nfc_verify_fail_title),
+                        message = getString(R.string.nfc_verify_fail_desc),
+                        buttonText = getString(R.string.nfc_verify_fail_button_label)
+                    ) {}
+                }
+            }
+        })
+        viewModel.errorResponse.observe(viewLifecycleOwner) {
+            showMessageDialog(
+                title = getString(R.string.general_server_error_title),
+                message = getString(R.string.general_server_error_desc, it.code, it.message),
+                buttonText = getString(R.string.general_server_error_action_button)
+            ) {}
         }
         binding.tbHome.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -106,31 +155,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeItemAdapter.OnHome
     }
 
     override fun onClickListener(item: TicketData) {
-        when (item.ticketStatus) {
-            NEW -> {
-                val action = HomeFragmentDirections.actionHomeFragmentToAssignFragment(item)
-                findNavController().navigate(action)
-            }
-
-            ASSIGNED -> {
-                val action = HomeFragmentDirections.actionHomeFragmentToProgressFragment(item)
-                findNavController().navigate(action)
-            }
-
-            ONPROG, ESKALASI -> {
-                val action =
-                    HomeFragmentDirections.actionHomeFragmentToFinalizeFragment(ticketData = item)
-                findNavController().navigate(action)
-            }
-
-            else -> {
-                showMessageDialog(
-                    title = "Under Construction",
-                    message = "This feature is under construction, lagi collect data yang di butuhin juga wkwkwk ^_^",
-                    buttonText = "Ok, Sip"
-                ) {}
-            }
-        }
+        viewModel.itemClicked = item
+        val dialogFragment = NfcVerifyDialog()
+        dialogFragment.setCancelable(false)
+        dialogFragment.show(childFragmentManager, "nfc_verify_dialog")
     }
 
 }

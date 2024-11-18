@@ -27,5 +27,6 @@ data class TicketData(
     @SerializedName("TicketID") val ticketID: Int,
     @SerializedName("TicketStatus") val ticketStatus: String,
     @SerializedName("UAP") val uAP: String,
-    @SerializedName("TicketDate") val ticketDate: String
+    @SerializedName("TicketDate") val ticketDate: String,
+    @SerializedName("Message") val message: String?
 ) : Serializable

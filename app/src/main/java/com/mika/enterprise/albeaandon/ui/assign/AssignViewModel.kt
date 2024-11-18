@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.mika.enterprise.albeaandon.core.model.response.PersonnelData
 import com.mika.enterprise.albeaandon.core.repository.NetworkRepository
 import com.mika.enterprise.albeaandon.core.repository.UserRepository
+import com.mika.enterprise.albeaandon.core.util.ErrorResponse
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
 import com.mika.enterprise.albeaandon.core.util.mappingAssignFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,8 @@ class AssignViewModel @Inject constructor(
     val personnelList: LiveData<List<PersonnelData>> = _personnelList
     private val _assignResult = MutableLiveData<Boolean>()
     val assignResult: LiveData<Boolean> = _assignResult
+    private val _errorResponse = MutableLiveData<ErrorResponse>()
+    val errorResponse: LiveData<ErrorResponse> = _errorResponse
 
     var selectedPersonnel: PersonnelData? = null
     var isNotSameUserGroup = false
@@ -39,7 +42,7 @@ class AssignViewModel @Inject constructor(
                 .collect {
                     showLoading.postValue(false)
                     when (it) {
-                        is ResultResponse.Error -> {}
+                        is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
                         is ResultResponse.Success -> {
                             if (isNotSameUserGroup) selectedPersonnel = null
                             _personnelList.postValue(it.data.data)
@@ -62,9 +65,7 @@ class AssignViewModel @Inject constructor(
             networkRepository.postAssignTicket(username, ticketId).collect {
                 showLoading.postValue(false)
                 when (it) {
-                    is ResultResponse.Error -> {
-
-                    }
+                    is ResultResponse.Error -> _errorResponse.postValue(it.errorResponse)
 
                     is ResultResponse.Success -> {
                         _assignResult.postValue(it.data.success)
@@ -74,7 +75,7 @@ class AssignViewModel @Inject constructor(
                         isNotAuthorized.postValue(true)
                     }
 
-                    is ResultResponse.EmptyOrNotFound -> {} // TODO: Add Empty State
+                    is ResultResponse.EmptyOrNotFound -> {}
                 }
             }
 
