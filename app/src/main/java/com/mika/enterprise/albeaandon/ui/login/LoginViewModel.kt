@@ -1,5 +1,6 @@
 package com.mika.enterprise.albeaandon.ui.login
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val networkRepository: NetworkRepository
+    private val networkRepository: NetworkRepository,
+    val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _loginResponse = MutableLiveData<Event<LoginResponse>>()
@@ -53,4 +55,6 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    val spinnerItems = listOf("English", "Chinese - 中文")
 }

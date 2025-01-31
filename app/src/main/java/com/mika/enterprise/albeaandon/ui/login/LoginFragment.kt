@@ -4,19 +4,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
+import com.mika.enterprise.albeaandon.core.util.AuthInterceptor
+import com.mika.enterprise.albeaandon.core.util.Constant.KEY_LANGUAGE
+import com.mika.enterprise.albeaandon.core.util.Constant.PROD_URL_ID
+import com.mika.enterprise.albeaandon.core.util.Constant.PROD_URL_ZH
 import com.mika.enterprise.albeaandon.core.util.EventObserver
+import com.mika.enterprise.albeaandon.core.util.getCodeLanguage
 import com.mika.enterprise.albeaandon.databinding.FragmentLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     private val viewModel: LoginViewModel by viewModels<LoginViewModel>()
+
+    @Inject
+    lateinit var authInterceptor: AuthInterceptor
 
     override fun inflateViewBinding(
         inflater: LayoutInflater,
@@ -27,6 +40,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupSpinner()
         handlingResetWhenTyping()
         binding.btnLogin.setOnClickListener {
             val username = binding.etUsername.text.toString()
@@ -69,6 +83,39 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         }
         binding.etPassword.addTextChangedListener {
             binding.tilEtPassword.error = null
+        }
+    }
+
+    private fun setupSpinner() {
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            viewModel.spinnerItems
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.languangeSpinner.adapter = adapter
+        binding.languangeSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedLanguage = viewModel.spinnerItems[position]
+                val languageCode = selectedLanguage.getCodeLanguage()
+                if (languageCode != viewModel.sharedPreferences.getString(KEY_LANGUAGE, "en")) {
+                    viewModel.sharedPreferences.edit().putString(KEY_LANGUAGE, languageCode).apply()
+                    authInterceptor.setUpdatedUrl(
+                        if (languageCode == "en") PROD_URL_ID
+                        else PROD_URL_ZH
+                    )
+                    activity?.recreate()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
         }
     }
 }

@@ -60,8 +60,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             delay(3000)
             if (viewModel.checkIfUserIsLoggedIn()) {
                 (requireActivity() as MainActivity).startMqttService()
-                val result = isServiceRunning(MqttService::class.java)
-                Log.e("All Running Service", result.toString())
                 findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToHomeFragment())
             } else {
                 findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToLoginFragment())

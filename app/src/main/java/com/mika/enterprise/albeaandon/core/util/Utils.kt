@@ -85,3 +85,11 @@ fun Context.getVersionName(): String = try {
     ""
 }
 
+fun String.getCodeLanguage(): String {
+    return when (this) {
+        "English" -> "en"
+        "Chinese - 中文" -> "zh"
+        else -> "en"
+    }
+}
+

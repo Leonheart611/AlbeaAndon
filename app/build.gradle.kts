@@ -18,9 +18,11 @@ android {
         minSdk = 34
         targetSdk = 34
         versionCode = 1
-        versionName = "0.1.4"
+        versionName = "0.1.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
+        buildConfigField("String","DEV_URL","\"https://api.dzuliot.my.id/\"")
+        buildConfigField("String","PROD_URL","\"http://dmksrv02:443/andon/\"")
     }
 
     buildTypes {
@@ -38,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     kotlinOptions {
         jvmTarget = "1.8"

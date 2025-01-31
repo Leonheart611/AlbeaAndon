@@ -70,8 +70,8 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
         dialog.setTitle(getString(R.string.unauthorized_title))
         dialog.setMessage(getString(R.string.unauthorized_desc))
         dialog.setActionButton(getString(R.string.unauthorized_button_label)) {
-            nextAction()
             dialog.dismiss()
+            nextAction()
         }
         dialog.show()
     }

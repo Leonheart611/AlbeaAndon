@@ -16,6 +16,7 @@ import com.mika.enterprise.albeaandon.core.model.response.ProblemTodo
 import com.mika.enterprise.albeaandon.core.model.response.TicketGeneralResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.toUser
+import com.mika.enterprise.albeaandon.core.util.Constant.KEY_LANGUAGE
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_NIK
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_TOKEN
 import com.mika.enterprise.albeaandon.core.util.ResultResponse
@@ -91,20 +92,24 @@ class NetworkRepositoryImpl @Inject constructor(
         password: String
     ): Flow<ResultResponse<LoginResponse>> =
         flow {
-            val response = api.login(LoginRequest(username, password))
-            when (response.code()) {
-                200 -> {
-                    response.body()?.let {
-                        sharedPreferences.edit().putString(USER_TOKEN, it.data.token).apply()
-                        sharedPreferences.edit().putString(USER_NIK, it.data.userRFID).apply()
-                        userRepository.insertUser(it.data.toUser())
-                        emit(ResultResponse.Success(it))
+            try {
+                val response = api.login(LoginRequest(username, password))
+                when (response.code()) {
+                    200 -> {
+                        response.body()?.let {
+                            sharedPreferences.edit().putString(USER_TOKEN, it.data.token).apply()
+                            sharedPreferences.edit().putString(USER_NIK, it.data.userRFID).apply()
+                            userRepository.insertUser(it.data.toUser())
+                            emit(ResultResponse.Success(it))
+                        }
                     }
-                }
 
-                401 -> emit(handleUnauthorizedError(response))
-                404 -> emit(handleNotFoundError(response))
-                else -> emit(handleGenericError(response))
+                    401 -> emit(handleUnauthorizedError(response))
+                    404 -> emit(handleNotFoundError(response))
+                    else -> emit(handleGenericError(response))
+                }
+            } catch (e: Exception) {
+                emit(handleGenericError(e))
             }
         }
 

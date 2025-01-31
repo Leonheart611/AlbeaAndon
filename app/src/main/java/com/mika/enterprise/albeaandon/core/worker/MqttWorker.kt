@@ -19,6 +19,7 @@ import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.util.Constant.FRAGMENT_KEY_SKIP_SPLASH
 import com.mika.enterprise.albeaandon.core.util.Constant.NOTIFICATION_CHANEL_ID
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_NIK
+import com.mika.enterprise.albeaandon.core.util.ContextUtils.Companion.getSavedLanguagePreference
 import info.mqtt.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
@@ -32,7 +33,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 class MqttWorker(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
 
-    val serverURI = "mqtt://techpack-iot.duckdns.org"
+    val serverURI = "tcp://10.160.50.14:1883"
+    val serverZh = "tcp://192.168.0.10:1883"
     val clientId = "mqttx_f549a571"
 
     val testingURI = "tcp://broker.hivemq.com:1883"
@@ -45,7 +47,10 @@ class MqttWorker(val context: Context, workerParams: WorkerParameters) :
     val pendingIntent: PendingIntent =
         PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-    private var mqttClient = MqttAndroidClient(context, testingURI, testClientId)
+    private var mqttClient = MqttAndroidClient(
+        context,
+        if (getSavedLanguagePreference(context) == "en") serverURI else serverZh, testClientId
+    )
 
     override fun doWork(): Result {
         while (!isStopped) {
@@ -68,7 +73,7 @@ class MqttWorker(val context: Context, workerParams: WorkerParameters) :
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
                     exception?.printStackTrace()
-                    Log.d("MQTT", "Failed to connect to: $testingURI, exception: $exception")
+                    Log.d("MQTT", "Failed to connect to: $serverURI, exception: $exception")
                 }
             })
 

@@ -23,10 +23,10 @@ import retrofit2.http.Query
 interface API {
 
     @Headers("Content-Type: application/json")
-    @POST("/auth/login")
+    @POST("auth/login")
     suspend fun login(@Body param: LoginRequest): Response<LoginResponse>
 
-    @GET("/api/tickets")
+    @GET("api/tickets")
     suspend fun getTickets(
         @Query("status") status: String,
         @Query("assign_to") assignTo:String? = null,
@@ -34,10 +34,10 @@ interface API {
         @Query("limit") limit: Int
     ): Response<TicketResponse>
 
-    @GET("/api/tickets")
+    @GET("api/tickets")
     suspend fun getTicketDetail(@Query("id") id: Int): Response<TicketResponse>
 
-    @GET("/api/tickets/personnels")
+    @GET("api/tickets/personnels")
     suspend fun getPersonnelsAvailability(
         @Query("group") userGroup: String,
         @Query("dept") userDept: String,
@@ -47,19 +47,19 @@ interface API {
     ): Response<PersonnelAvailabilityResponse>
 
     @Headers("Content-Type: application/json")
-    @POST("/api/tickets/assign")
+    @POST("api/tickets/assign")
     suspend fun postAssignTicket(
         @Body param: AssignTicketRequest
     ): Response<AssignTicketResponse>
 
-    @GET("/api/problems/problem_group")
+    @GET("api/problems/problem_group")
     suspend fun getProblemGroup(
         @Query("is_escalated") isEscalated: Int,
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 100
     ): Response<ProblemGroupResponse>
 
-    @GET("/api/problems/problem")
+    @GET("api/problems/problem")
     suspend fun getProblem(
         @Query("problem_group_id") problemGroupId: Int,
         @Query("is_escalated") isEscalated: Int,
@@ -67,7 +67,7 @@ interface API {
         @Query("limit") limit: Int = 100
     ): Response<ProblemGroupResponse>
 
-    @GET("/api/problems/todo")
+    @GET("api/problems/todo")
     suspend fun getTodoProblem(
         @Query("problem_id") problemId: Int,
         @Query("is_escalated") isEscalated: Int,
@@ -76,11 +76,11 @@ interface API {
     ): Response<ProblemTodo>
 
     @Headers("Content-Type: application/json")
-    @POST("/api/tickets/onprog")
+    @POST("api/tickets/onprog")
     suspend fun postOnProgressTicket(@Body param: OnprogTicketRequest): Response<TicketGeneralResponse>
 
     @Headers("Content-Type: application/json")
-    @POST("/api/tickets/escalate")
+    @POST("api/tickets/escalate")
     suspend fun postEscalateTicket(@Body param: EscalateTicketMechanicRequest): Response<TicketGeneralResponse>
 
 /*    @Headers("Content-Type: application/json")
@@ -88,10 +88,10 @@ interface API {
     suspend fun postEscalateTicket(@Body param: EscalateTicketMechanicRequest): Response<TicketGeneralResponse>*/
 
     @Headers("Content-Type: application/json")
-    @POST("/api/tickets/close")
+    @POST("api/tickets/close")
     suspend fun postCloseTicket(@Body param: CloseTicketRequest): Response<TicketGeneralResponse>
 
     @Headers("Content-Type: application/json")
-    @POST("/api/tickets/notify")
+    @POST("api/tickets/notify")
     suspend fun postNotifyTicket(@Body param: NotifyTicketRequest): Response<TicketGeneralResponse>
 }
