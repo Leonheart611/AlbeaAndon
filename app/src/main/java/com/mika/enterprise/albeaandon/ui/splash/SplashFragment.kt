@@ -1,11 +1,8 @@
 package com.mika.enterprise.albeaandon.ui.splash
 
 import android.Manifest
-import android.app.ActivityManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +16,6 @@ import com.mika.enterprise.albeaandon.core.BaseFragment
 import com.mika.enterprise.albeaandon.core.util.Constant.FRAGMENT_KEY_SKIP_SPLASH
 import com.mika.enterprise.albeaandon.core.util.Constant.REQUEST_CODE
 import com.mika.enterprise.albeaandon.core.util.getVersionName
-import com.mika.enterprise.albeaandon.core.worker.MqttService
 import com.mika.enterprise.albeaandon.databinding.FragmentSplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -66,16 +62,5 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             }
 
         }
-    }
-
-    fun isServiceRunning(serviceClass: Class<*>): Boolean {
-        val activityManager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val runningServices = activityManager.getRunningServices(Integer.MAX_VALUE)
-        for (service in runningServices) {
-            if (serviceClass.name == service.service.className) {
-                return true
-            }
-        }
-        return false
     }
 }

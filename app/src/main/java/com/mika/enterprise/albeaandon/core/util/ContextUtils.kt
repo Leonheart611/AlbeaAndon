@@ -25,10 +25,5 @@ class ContextUtils(base: Context) : ContextWrapper(base) {
             return sharedPreferences.getString(KEY_LANGUAGE, "en").orEmpty()
         }
 
-        fun saveLanguagePreference(context: Context, languageCode: String) {
-            val sharedPreferences = context.getSharedPreferences(PREFERENCES_FILE_KEY, Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString(KEY_LANGUAGE, languageCode).apply()
-        }
-
     }
 }

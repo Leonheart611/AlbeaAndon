@@ -16,7 +16,6 @@ import com.mika.enterprise.albeaandon.core.model.response.ProblemTodo
 import com.mika.enterprise.albeaandon.core.model.response.TicketGeneralResponse
 import com.mika.enterprise.albeaandon.core.model.response.TicketResponse
 import com.mika.enterprise.albeaandon.core.model.response.toUser
-import com.mika.enterprise.albeaandon.core.util.Constant.KEY_LANGUAGE
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_NIK
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_TOKEN
 import com.mika.enterprise.albeaandon.core.util.ResultResponse

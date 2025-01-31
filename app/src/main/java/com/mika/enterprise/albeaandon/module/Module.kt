@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.mika.enterprise.albeaandon.BuildConfig.DEV_URL
 import com.mika.enterprise.albeaandon.core.AppDatabase
 import com.mika.enterprise.albeaandon.core.dao.UserDao
 import com.mika.enterprise.albeaandon.core.domain.API
@@ -13,10 +12,8 @@ import com.mika.enterprise.albeaandon.core.repository.NetworkRepositoryImpl
 import com.mika.enterprise.albeaandon.core.repository.UserRepository
 import com.mika.enterprise.albeaandon.core.repository.UserRepositoryImpl
 import com.mika.enterprise.albeaandon.core.util.AuthInterceptor
-import com.mika.enterprise.albeaandon.core.util.Constant.KEY_LANGUAGE
 import com.mika.enterprise.albeaandon.core.util.Constant.PREFERENCES_FILE_KEY
 import com.mika.enterprise.albeaandon.core.util.Constant.PROD_URL_ID
-import com.mika.enterprise.albeaandon.core.util.Constant.PROD_URL_ZH
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

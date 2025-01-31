@@ -1,14 +1,12 @@
 package com.mika.enterprise.albeaandon.core.util
 
 import android.content.SharedPreferences
-import com.mika.enterprise.albeaandon.core.util.Constant.KEY_LANGUAGE
 import com.mika.enterprise.albeaandon.core.util.Constant.PROD_URL_ID
 import com.mika.enterprise.albeaandon.core.util.Constant.USER_TOKEN
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.text.split
 
 @Singleton
 class AuthInterceptor @Inject constructor(
