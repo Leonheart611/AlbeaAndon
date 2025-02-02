@@ -13,4 +13,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val problemGroupValue = MutableLiveData<Event<ProblemGeneralResponse>>()
     val problemValue = MutableLiveData<Event<ProblemGeneralResponse>>()
     val todoValue = MutableLiveData<Event<ProblemGeneralResponse>>()
+
+    fun resetTodoValue() {
+        todoValue.postValue(Event(ProblemGeneralResponse(0, "")))
+        problemValue.postValue(Event(ProblemGeneralResponse(0, "")))
+        problemGroupValue.postValue(Event(ProblemGeneralResponse(0, "")))
+    }
 }

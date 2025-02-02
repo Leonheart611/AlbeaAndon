@@ -14,13 +14,11 @@ import com.mika.enterprise.albeaandon.MainActivity
 import com.mika.enterprise.albeaandon.MainViewModel
 import com.mika.enterprise.albeaandon.R
 import com.mika.enterprise.albeaandon.core.BaseFragment
-import com.mika.enterprise.albeaandon.core.util.Constant.IS_INTERNAL_TEST
 import com.mika.enterprise.albeaandon.core.util.Constant.ONPROG
 import com.mika.enterprise.albeaandon.core.util.EventObserver
 import com.mika.enterprise.albeaandon.core.util.convertDateIntoLocalDateTime
 import com.mika.enterprise.albeaandon.core.util.mappingColors
 import com.mika.enterprise.albeaandon.databinding.FragmentOnprogressBinding
-import com.mika.enterprise.albeaandon.ui.util.NfcVerifyDialog
 import com.mika.enterprise.albeaandon.ui.util.ProblemListBottomSheet
 import com.mika.enterprise.albeaandon.ui.util.ProblemListBottomSheet.Companion.ProblemType.GROUP_PROBLEM
 import com.mika.enterprise.albeaandon.ui.util.ProblemListBottomSheet.Companion.ProblemType.PROBLEM
@@ -127,6 +125,7 @@ class ProgressFragment : BaseFragment<FragmentOnprogressBinding>() {
                 message = "",
                 buttonText = getString(R.string.onprogress_success_button_label)
             ) {
+                activityViewModel.resetTodoValue()
                 findNavController().popBackStack()
             }
         }

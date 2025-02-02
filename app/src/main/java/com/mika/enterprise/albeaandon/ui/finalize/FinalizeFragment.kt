@@ -63,14 +63,17 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
                         title = getString(R.string.finalize_close_ticket_success),
                         message = "",
                         buttonText = getString(R.string.finalize_success_button_label)
+                    ) {
+                        activityViewModel.resetTodoValue()
+                        findNavController().popBackStack()
+                    }
+                } else {
+                    showMessageDialog(
+                        title = getString(R.string.finalize_notify_done_ticket_success),
+                        message = "",
+                        buttonText = getString(R.string.finalize_success_button_label)
                     ) { findNavController().popBackStack() }
                 }
-                else
-                showMessageDialog(
-                    title = getString(R.string.finalize_notify_done_ticket_success),
-                    message = "",
-                    buttonText = getString(R.string.finalize_success_button_label)
-                ) { findNavController().popBackStack() }
             }
         }
         viewModel.escalateTicketStatus.observe(viewLifecycleOwner) {
@@ -95,7 +98,7 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
                 buttonText = getString(R.string.general_server_error_action_button)
             ) {}
         }
-        activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
+/*        activityViewModel.nfcValue.observe(viewLifecycleOwner, EventObserver {
             if (it == args.ticketData?.rfid.orEmpty() || IS_INTERNAL_TEST) {
                 viewModel.closeTicket(activityViewModel.todoValue.value?.peekContent()?.id ?: 0)
             } else {
@@ -105,7 +108,7 @@ class FinalizeFragment : BaseFragment<FragmentFinalizeBinding>() {
                     buttonText = getString(R.string.nfc_verify_fail_button_label)
                 ) {}
             }
-        })
+        })*/
     }
 
     private fun setupAction() = with(binding) {
